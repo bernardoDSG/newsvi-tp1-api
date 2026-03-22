@@ -1,0 +1,114 @@
+@startuml diagrama
+title Diagrama de Classes - CRUD's Administrativos
+caption Aluno: Bernardo dos Santos Graça
+
+' --------------------
+' Classes principais
+' --------------------
+
+class Filme {
+    - titulo : String
+    - duracao : String
+    - sinopse : String
+    - idiomaOriginal : String 
+    - anoLancamento : Integer
+}
+
+
+
+enum TipoSessao {
+    DUBLADA
+    LEGENDADA
+}
+
+enum ClassificacaoIndicativa {
+    LIVRE
+    DEZ
+    DOZE
+    QUATORZE
+    DEZESSEIS
+    DEZOITO
+}
+
+enum Premio {
+    OSCAR
+    GLOBODEOURO
+    PALMADEOURO
+    LEAODEOURO
+    URSODEOURO
+    BAFTA 
+}
+
+enum Genero {
+    ACAO
+    COMEDIA
+    DRAMA
+    TERROR
+    SUSPENSE
+    FICCAO
+    CIENTIFICO
+    FANTASIA
+    ROMANCE
+    AVENTURA
+    ANIMACAO
+}
+
+
+class Ator {
+    - nome : String
+    - dataNascimento : Date
+    - nacionalidade : String
+}
+
+
+
+class Sessao {
+    - horarioInicio : DateTime
+    - horarioFim : DateTime
+
+}
+
+class Sala {
+    - nome : String
+}
+
+class Poltrona {
+    - nome : String
+    - estaOcupada : Boolean
+}
+
+
+' --------------------
+' Subclasses
+' --------------------
+class AtorPremiado {
+
+}
+
+class FilmePremiado {
+
+}
+
+
+
+
+' --------------------
+' Herança
+' --------------------
+
+AtorPremiado --|> Ator
+FilmePremiado --|> Filme
+
+' --------------------
+' Relacionamentos
+' --------------------
+Filme "*" --> "*" Ator : atoresPrincipais
+Filme "*" --> "*" Genero : genero
+FilmePremiado "*" --> "*" Premio : premiacao
+AtorPremiado "*" --> "*" Premio : premiacao
+Sessao "*" --> "1" TipoSessao : tipoSessao
+Sessao "*" --> "*" Sala
+Sala "1" *--> "*" Poltrona
+Sessao "*" o--> "1" Filme
+Filme "*" --> "1" ClassificacaoIndicativa : classificacaoIndicativa
+@enduml
