@@ -30,34 +30,19 @@ enum ClassificacaoIndicativa {
     DEZOITO
 }
 
-enum Premio {
-    OSCAR
-    GLOBODEOURO
-    PALMADEOURO
-    LEAODEOURO
-    URSODEOURO
-    BAFTA 
+class Premio {
+    - nome : String
+    - categoria : String
+    - ano : Integer
 }
 
-enum Genero {
-    ACAO
-    COMEDIA
-    DRAMA
-    TERROR
-    SUSPENSE
-    FICCAO
-    CIENTIFICO
-    FANTASIA
-    ROMANCE
-    AVENTURA
-    ANIMACAO
+class Genero {
+    - nome : String
 }
 
 
 class Ator {
     - nome : String
-    - dataNascimento : Date
-    - nacionalidade : String
 }
 
 
@@ -107,8 +92,8 @@ Filme "*" --> "*" Genero : genero
 FilmePremiado "*" --> "*" Premio : premiacao
 AtorPremiado "*" --> "*" Premio : premiacao
 Sessao "*" --> "1" TipoSessao : tipoSessao
-Sessao "*" --> "*" Sala
-Sala "1" *--> "*" Poltrona
-Sessao "*" o--> "1" Filme
+Sessao "*" --> "*" Sala : salas
+Sala "1" *--> "*" Poltrona : poltronas
+Sessao "*" o--> "1" Filme : filme
 Filme "*" --> "1" ClassificacaoIndicativa : classificacaoIndicativa
 @enduml
