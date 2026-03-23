@@ -20,4 +20,16 @@ public enum TipoSessao {
         return NOME;
     }
 
+    public static TipoSessao valueOf(Long id) {
+        if (id == null) {
+            return null;
+        }
+
+        for (TipoSessao tipoSessao : TipoSessao.values()) {
+            if (tipoSessao.getID().equals(id)) {
+                return tipoSessao;
+            }
+        }
+        return null;
+    }
 }
