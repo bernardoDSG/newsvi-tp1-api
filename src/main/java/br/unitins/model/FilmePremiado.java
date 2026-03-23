@@ -6,10 +6,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 
-public class AtorPremiado extends Ator {
+public class FilmePremiado extends Filme {
     @ManyToMany
-    @JoinTable(name = "ator_premio", 
-               joinColumns = @JoinColumn(name = "ator_id"), 
+    @JoinTable(name = "filme_premio", 
+               joinColumns = @JoinColumn(name = "filme_id"), 
                inverseJoinColumns = @JoinColumn(name = "premio_id"))
     private List<Premio> premiacao;
 
@@ -20,5 +20,5 @@ public class AtorPremiado extends Ator {
     public void setPremiacao(List<Premio> premiacao) {
         this.premiacao = premiacao;
     }
-
+    
 }

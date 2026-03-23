@@ -7,7 +7,7 @@ caption Aluno: Bernardo dos Santos Graça
 ' --------------------
 
 class Filme {
-    - titulo : String
+    - nome : String
     - duracao : String
     - sinopse : String
     - idiomaOriginal : String 
@@ -54,7 +54,6 @@ class Sessao {
 }
 
 class Sala {
-    - nome : String
 }
 
 class Poltrona {
