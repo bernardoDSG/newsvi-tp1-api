@@ -14,6 +14,10 @@ class Filme {
     - anoLancamento : Integer
 }
 
+enum Disponibilidade {
+    DISPONIVEL
+    INDISPONIVEL
+}
 
 
 enum TipoSessao {
@@ -48,8 +52,8 @@ class Ator {
 
 
 class Sessao {
-    - horarioInicio : DateTime
-    - horarioFim : DateTime
+    - horarioInicio : LocalDateTime
+    - horarioFim : LocalDateTime
 
 }
 
@@ -57,8 +61,7 @@ class Sala {
 }
 
 class Poltrona {
-    - nome : String
-    - estaOcupada : Boolean
+    - codigo : String
 }
 
 
@@ -95,4 +98,5 @@ Sessao "*" --> "*" Sala : salas
 Sala "1" *--> "*" Poltrona : poltronas
 Sessao "*" o--> "1" Filme : filme
 Filme "*" --> "1" ClassificacaoIndicativa : classificacaoIndicativa
+Poltrona "*" --> "1" Disponibilidade : disponibilidade
 @enduml

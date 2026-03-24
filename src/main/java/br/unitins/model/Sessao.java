@@ -1,0 +1,53 @@
+package br.unitins.model;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+
+public class Sessao {
+   LocalDateTime inicio;
+   LocalDateTime fim;
+   Filme filme;
+   TipoSessao tipo;
+   @ManyToMany
+   @JoinTable(name = "sessao_sala", 
+               joinColumns = @JoinColumn(name = "sessao_id"), 
+               inverseJoinColumns = @JoinColumn(name = "sala_id"))
+   List<Sala> salas;
+   
+   public LocalDateTime getInicio() {
+      return inicio;
+   }
+   public void setInicio(LocalDateTime inicio) {
+      this.inicio = inicio;
+   }
+   public LocalDateTime getFim() {
+      return fim;
+   }
+   public void setFim(LocalDateTime fim) {
+      this.fim = fim;
+   }
+   public Filme getFilme() {
+      return filme;
+   }
+   public void setFilme(Filme filme) {
+      this.filme = filme;
+   }
+   public TipoSessao getTipo() {
+      return tipo;
+   }
+   public void setTipo(TipoSessao tipo) {
+      this.tipo = tipo;
+   }
+   public List<Sala> getSalas() {
+      return salas;
+   }
+   public void setSalas(List<Sala> salas) {
+      this.salas = salas;
+   }
+
+   
+}
