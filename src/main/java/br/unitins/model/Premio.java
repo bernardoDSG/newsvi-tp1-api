@@ -19,4 +19,6 @@ public class Premio extends DefaultEntity{
     public void setAno(Integer ano) {
         this.ano = ano;
     }
+
+    
 }
