@@ -36,7 +36,6 @@ enum ClassificacaoIndicativa {
 
 class Premio {
     - nome : String
-    - categoria : String
     - ano : Integer
 }
 

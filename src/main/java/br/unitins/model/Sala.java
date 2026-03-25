@@ -10,4 +10,12 @@ public class Sala extends DefaultEntity {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "sala_id")
     List<Poltrona> poltronas;
+
+    public List<Poltrona> getPoltronas() {
+        return poltronas;
+    }
+
+    public void setPoltronas(List<Poltrona> poltronas) {
+        this.poltronas = poltronas;
+    }
 }

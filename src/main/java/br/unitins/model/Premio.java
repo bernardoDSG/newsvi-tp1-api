@@ -2,7 +2,6 @@ package br.unitins.model;
 
 public class Premio extends DefaultEntity{
     private String nome;
-    private String categoria;
     private Integer ano;
 
     public String getNome() {
@@ -11,14 +10,6 @@ public class Premio extends DefaultEntity{
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
     }
 
     public Integer getAno() {
