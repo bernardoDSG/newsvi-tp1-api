@@ -10,4 +10,6 @@ public class Genero extends DefaultEntity {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    }
 }

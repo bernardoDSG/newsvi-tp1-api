@@ -10,6 +10,9 @@ public interface FilmeService {
     List<Filme> findByNome(String nome);
     List<Filme> findByAnoLancamento(Integer anoLancamento);
     List<Filme> findByIdiomaOriginal(String idiomaOriginal);
+    List<Filme> findByClassificacaoIndicativa(Long idClassificacaoIndicativa);
+    List<Filme> findByGenero(Long idGenero);
+    List<Filme> findByAtor(Long idAtor);
     Filme create(Filme filme);
     void update(Long id, Filme filme);
     void delete(Long id);
