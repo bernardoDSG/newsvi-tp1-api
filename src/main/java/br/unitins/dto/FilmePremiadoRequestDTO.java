@@ -9,8 +9,8 @@ public record FilmePremiadoRequestDTO(
         String idiomaOriginal,
         Integer anoLancamento,
         Long idClassificacaoIndicativa,
-        List<Long> idGeneros,
-        List<Long> idAtores,
-        List<Long> idsPremios) {
+        List<GeneroRequestDTO> generosRequestDTOs,
+        List<AtorRequestDTO> atoresRequestDTOs,
+        List<PremioRequestDTO> premiosRequestDTOs) {
 
 }

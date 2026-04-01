@@ -1,15 +1,13 @@
 package br.unitins.mapper;
 
 import br.unitins.dto.FilmeRequestDTO;
+import br.unitins.dto.FilmeResponseDTO;
 import br.unitins.model.ClassificacaoIndicativa;
 import br.unitins.model.Filme;
-import br.unitins.service.FilmeService;
-import br.unitins.service.GeneroService;
-import jakarta.inject.Inject;
+
 
 public class FilmeMapper {
-    @Inject
-    GeneroService service;
+    
 
     public static Filme toEntity(FilmeRequestDTO filmeDTO) {
         if (filmeDTO == null) {
@@ -22,6 +20,26 @@ public class FilmeMapper {
         filme.setIdiomaOriginal(filmeDTO.idiomaOriginal());
         filme.setAnoLancamento(filmeDTO.anoLancamento());
         filme.setClassificacaoIndicativa(ClassificacaoIndicativa.valueOf(filmeDTO.idClassificacaoIndicativa()));
-        filme.getGeneros(filmeDTO.idGeneros().stream().map(id -> service.findById(id)).toList());
+        filme.setGeneros(filmeDTO.generosRequestDTOs().stream().map(GeneroMapper::toEntity).toList());
+        filme.setAtores(filmeDTO.atoresRequestDTOs().stream().map(AtorMapper::toEntity).toList());
+        return filme;
+
+    }
+
+    public static FilmeResponseDTO toResponseDTO (Filme filme) {
+        if (filme == null) {
+            return null;
+        }
+        return new FilmeResponseDTO(
+            filme.getId(), 
+            filme.getNome(), 
+            filme.getDuracao(), 
+            filme.getSinopse(), 
+            filme.getIdiomaOriginal(), 
+            filme.getAnoLancamento(), 
+            filme.getClassificacaoIndicativa(),
+            filme.getGeneros().stream().map(GeneroMapper::toResponseDTO).toList(),
+            filme.getAtores().stream().map(AtorMapper::toResponseDTO).toList()
+        );
     }
 }

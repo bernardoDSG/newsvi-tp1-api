@@ -7,7 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 
-public class Sessao {
+public class Sessao extends DefaultEntity {
    LocalDateTime inicio;
    LocalDateTime fim;
    Filme filme;

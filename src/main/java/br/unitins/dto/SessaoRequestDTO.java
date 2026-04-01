@@ -6,9 +6,9 @@ import java.util.List;
 public record SessaoRequestDTO(
     LocalDateTime inicio,
     LocalDateTime fim,
-    Long idFilme,
+    FilmeRequestDTO filmeRequestDTO,
     Long idTipoSessao,
-    List<Long> idSalas
+    List<SalaRequestDTO> salaRequestDTOs
 
 ) {
     
