@@ -1,5 +1,8 @@
 package br.unitins.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Disponibilidade {
     DISPONIVEL(1L, "Disponível"),
     INDISPONIVEL(2L, "Indisponível");

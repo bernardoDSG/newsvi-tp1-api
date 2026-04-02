@@ -4,9 +4,11 @@ import java.util.List;
 
 import br.unitins.model.Filme;
 import br.unitins.repository.FilmeRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+@ApplicationScoped
 public class FilmeServiceImpl implements FilmeService {
 
     @Inject

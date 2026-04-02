@@ -4,9 +4,11 @@ import java.util.List;
 
 import br.unitins.model.Genero;
 import br.unitins.repository.GeneroRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+@ApplicationScoped
 public class GeneroServiceImpl implements GeneroService {
 
     @Inject

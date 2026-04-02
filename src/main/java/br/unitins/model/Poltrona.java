@@ -1,5 +1,8 @@
 package br.unitins.model;
 
+import jakarta.persistence.Entity;
+
+@Entity
 public class Poltrona extends DefaultEntity {
     private String codigo;
     private Disponibilidade disponibilidade;

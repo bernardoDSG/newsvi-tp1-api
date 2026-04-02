@@ -3,13 +3,17 @@ package br.unitins.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
+@Entity
 public class Sessao extends DefaultEntity {
    LocalDateTime inicio;
    LocalDateTime fim;
+   @ManyToOne
    Filme filme;
    TipoSessao tipo;
    @ManyToMany

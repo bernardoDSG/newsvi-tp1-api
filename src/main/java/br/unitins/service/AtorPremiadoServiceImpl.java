@@ -4,9 +4,11 @@ import java.util.List;
 
 import br.unitins.model.AtorPremiado;
 import br.unitins.repository.AtorPremiadoRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+@ApplicationScoped
 public class AtorPremiadoServiceImpl implements AtorPremiadoService {
 
     @Inject

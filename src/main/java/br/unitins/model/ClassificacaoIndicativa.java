@@ -1,5 +1,8 @@
 package br.unitins.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ClassificacaoIndicativa {
     LIVRE(1L, "Livre"),
     DEZ(2L, "10 anos"),

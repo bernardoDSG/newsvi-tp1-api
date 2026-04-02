@@ -4,9 +4,11 @@ import java.util.List;
 
 import br.unitins.model.Sala;
 import br.unitins.repository.SalaRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+@ApplicationScoped
 public class SalaServiceImpl implements SalaService {
 
     @Inject

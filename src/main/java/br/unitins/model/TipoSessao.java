@@ -1,5 +1,8 @@
 package br.unitins.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TipoSessao {
     DUBLADA(1L,"Dublada"),
     LEGENDADA(2L,"Legendada");

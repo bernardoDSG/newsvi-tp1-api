@@ -2,10 +2,12 @@ package br.unitins.model;
 
 import java.util.List;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 
+@Entity
 public class FilmePremiado extends Filme {
     @ManyToMany
     @JoinTable(name = "filme_premio", 

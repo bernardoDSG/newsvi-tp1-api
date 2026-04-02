@@ -4,9 +4,11 @@ import java.util.List;
 
 import br.unitins.model.Premio;
 import br.unitins.repository.PremioRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+@ApplicationScoped
 public class PremioServiceImpl implements PremioService {
 
     @Inject
