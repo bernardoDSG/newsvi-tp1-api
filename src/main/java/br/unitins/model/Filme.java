@@ -2,6 +2,8 @@ package br.unitins.model;
 
 import java.util.List;
 
+import br.unitins.converter.ClassificacaoIndicativaConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -14,6 +16,7 @@ public class Filme extends DefaultEntity{
     private String sinopse;
     private String idiomaOriginal;
     private Integer anoLancamento;
+    @Convert(converter = ClassificacaoIndicativaConverter.class)
     private ClassificacaoIndicativa classificacaoIndicativa;
     @ManyToMany
     @JoinTable(name = "filme_genero", 

@@ -3,6 +3,8 @@ package br.unitins.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.unitins.converter.TipoSessaoConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -15,6 +17,7 @@ public class Sessao extends DefaultEntity {
    LocalDateTime fim;
    @ManyToOne
    Filme filme;
+   @Convert(converter = TipoSessaoConverter.class)
    TipoSessao tipo;
    @ManyToMany
    @JoinTable(name = "sessao_sala", 

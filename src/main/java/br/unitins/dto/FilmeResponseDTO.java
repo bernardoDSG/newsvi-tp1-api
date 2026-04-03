@@ -11,5 +11,6 @@ public record FilmeResponseDTO(
     Integer anoLancamento,
     String classificacaoIndicativa,
     List<String> generos,
-    List<String> atores
+    List<String> atores,
+    List<String> premios
 ) {}
