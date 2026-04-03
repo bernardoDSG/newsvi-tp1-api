@@ -5,5 +5,5 @@ import java.util.List;
 public record AtorResponseDTO(
     Long id,
     String nome,
-    List<String> premios
+    List<PremioResponseDTO> premios
 ) {}

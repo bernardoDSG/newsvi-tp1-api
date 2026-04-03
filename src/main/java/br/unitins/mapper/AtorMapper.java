@@ -22,7 +22,9 @@ public class AtorMapper {
         return new AtorResponseDTO(
             ator.getId(),
             ator.getNome(),
-            ator.getPremios() != null ? ator.getPremios().stream().map(p -> p.getNome()).toList() : null
+            ator.getPremios() != null ? ator.getPremios().stream()
+                .map(PremioMapper::toResponseDTO)
+                .toList() : null
         );
     }
 }
