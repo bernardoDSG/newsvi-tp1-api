@@ -4,7 +4,5 @@ import java.util.List;
 
 public record SalaResponseDTO(
     Long id,
-    List<PoltronaResponseDTO> poltronas
-) {
-    
-}
+    List<String> poltronasCodigos
+) {}

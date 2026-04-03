@@ -3,13 +3,27 @@ package br.unitins.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record SessaoRequestDTO(
-    LocalDateTime inicio,
-    LocalDateTime fim,
-    FilmeRequestDTO filmeRequestDTO,
-    Long idTipoSessao,
-    List<SalaRequestDTO> salaRequestDTOs
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-) {
+public record SessaoRequestDTO(
+    @NotNull(message = "Horário de início é obrigatório")
+    @Future(message = "Horário de início deve ser futuro")
+    LocalDateTime inicio,
     
-}
+    @NotNull(message = "Horário de fim é obrigatório")
+    @Future(message = "Horário de fim deve ser futuro")
+    LocalDateTime fim,
+    
+    @NotNull(message = "Filme é obrigatório")
+    @Positive(message = "ID do filme deve ser positivo")
+    Long filmeId,
+    
+    @NotNull(message = "Tipo de sessão é obrigatório")
+    @Positive(message = "ID do tipo de sessão deve ser positivo")
+    Long tipoSessaoId,
+    
+    @NotNull(message = "Salas são obrigatórias")
+    List<@Positive(message = "ID da sala deve ser positivo") Long> salasIds
+) {}

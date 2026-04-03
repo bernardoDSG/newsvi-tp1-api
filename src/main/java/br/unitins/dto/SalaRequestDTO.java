@@ -2,8 +2,9 @@ package br.unitins.dto;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotNull;
+
 public record SalaRequestDTO(
-    List<PoltronaRequestDTO> poltronas
-) {
-    
-}
+    @NotNull(message = "Lista de poltronas é obrigatória")
+    List<@Positive(message = "ID da poltrona deve ser positivo") Long> poltronasIds
+) {}

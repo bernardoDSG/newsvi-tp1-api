@@ -4,6 +4,4 @@ public record PremioResponseDTO(
     Long id,
     String nome,
     Integer ano
-) {
-    
-}
+) {}

@@ -2,8 +2,6 @@ package br.unitins.dto;
 
 import java.util.List;
 
-import br.unitins.model.ClassificacaoIndicativa;
-
 public record FilmeResponseDTO(
     Long id,
     String nome,
@@ -11,9 +9,7 @@ public record FilmeResponseDTO(
     String sinopse,
     String idiomaOriginal,
     Integer anoLancamento,
-    ClassificacaoIndicativa classificacaoIndicativa,
-    List<GeneroResponseDTO> generos,
-    List<AtorResponseDTO> atores
-) {
-    
-}
+    String classificacaoIndicativa,
+    List<String> generos,
+    List<String> atores
+) {}
