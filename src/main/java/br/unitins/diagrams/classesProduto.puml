@@ -36,6 +36,7 @@ enum ClassificacaoIndicativa {
 
 class Premio {
     - nome : String
+    - categoria : String
     - ano : Integer
 }
 
@@ -65,37 +66,16 @@ class Poltrona {
 
 
 ' --------------------
-' Subclasses
-' --------------------
-class AtorPremiado {
-
-}
-
-class FilmePremiado {
-
-}
-
-
-
-
-' --------------------
-' Herança
-' --------------------
-
-AtorPremiado --|> Ator
-FilmePremiado --|> Filme
-
-' --------------------
 ' Relacionamentos
 ' --------------------
 Filme "*" --> "*" Ator : atoresPrincipais
 Filme "*" --> "*" Genero : genero
-FilmePremiado "*" --> "*" Premio : premiacao
-AtorPremiado "*" --> "*" Premio : premiacao
 Sessao "*" --> "1" TipoSessao : tipoSessao
 Sessao "*" --> "*" Sala : salas
 Sala "1" *--> "*" Poltrona : poltronas
 Sessao "*" o--> "1" Filme : filme
 Filme "*" --> "1" ClassificacaoIndicativa : classificacaoIndicativa
 Poltrona "*" --> "1" Disponibilidade : disponibilidade
+Ator"1" --> "0..*" Premio : premios
+Filme"1" --> "0..*" Premio : premios
 @enduml

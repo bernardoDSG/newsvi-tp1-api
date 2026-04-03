@@ -11,4 +11,8 @@ public class AtorRepository implements PanacheRepository<Ator>{
     public PanacheQuery<Ator> findByNome(String nome) {
         return find("UPPER(nome) LIKE UPPER(?1)", "%" + nome + "%");
     }
+
+    public PanacheQuery<Ator> findByPremio(String premio) {
+        return find("UPPER(premios.nome) LIKE UPPER(?1)", "%" + premio + "%");
+    }
 }
