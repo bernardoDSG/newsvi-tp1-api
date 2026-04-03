@@ -13,6 +13,7 @@ public class PremioMapper {
         Premio premio = new Premio();
         premio.setNome(dto.nome());
         premio.setAno(dto.ano());
+        premio.setCategoria(dto.categoria());
         return premio;
     }
 
@@ -20,6 +21,11 @@ public class PremioMapper {
         if (premio == null) {
             return null;
         }
-        return new PremioResponseDTO(premio.getId(), premio.getNome(), premio.getAno());
+        return new PremioResponseDTO(
+            premio.getId(), 
+            premio.getNome(), 
+            premio.getAno(),
+            premio.getCategoria()
+        );
     }
 }

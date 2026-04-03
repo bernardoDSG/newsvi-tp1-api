@@ -3,8 +3,9 @@ package br.unitins.model;
 import jakarta.persistence.Entity;
 
 @Entity
-public class Premio extends DefaultEntity{
+public class Premio extends DefaultEntity {
     private String nome;
+    private String categoria;
     private Integer ano;
 
     public String getNome() {
@@ -15,6 +16,14 @@ public class Premio extends DefaultEntity{
         this.nome = nome;
     }
 
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
     public Integer getAno() {
         return ano;
     }
@@ -23,5 +32,4 @@ public class Premio extends DefaultEntity{
         this.ano = ano;
     }
 
-    
 }

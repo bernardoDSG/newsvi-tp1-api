@@ -66,10 +66,21 @@ public class PremioResource {
     @POST
     public Response criar(@Valid PremioRequestDTO dto) {
         try {
+            int anoAtual = java.time.Year.now().getValue();
+            if (dto.ano() > anoAtual) {
+                return Response.status(Status.BAD_REQUEST)
+                    .entity("Ano não pode ser futuro. Ano atual: " + anoAtual)
+                    .build();
+            }
+            
             Premio premio = PremioMapper.toEntity(dto);
             service.create(premio);
             return Response.status(Status.CREATED)
                 .entity(PremioMapper.toResponseDTO(premio))
+                .build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Status.BAD_REQUEST)
+                .entity(e.getMessage())
                 .build();
         } catch (Exception e) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -89,10 +100,21 @@ public class PremioResource {
                     .build();
             }
             
+            int anoAtual = java.time.Year.now().getValue();
+            if (dto.ano() > anoAtual) {
+                return Response.status(Status.BAD_REQUEST)
+                    .entity("Ano não pode ser futuro. Ano atual: " + anoAtual)
+                    .build();
+            }
+            
             Premio premio = PremioMapper.toEntity(dto);
             premio.setId(id);
             service.update(id, premio);
             return Response.ok(PremioMapper.toResponseDTO(premio)).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Status.BAD_REQUEST)
+                .entity(e.getMessage())
+                .build();
         } catch (Exception e) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
                 .entity("Erro ao atualizar prêmio: " + e.getMessage())

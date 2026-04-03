@@ -67,15 +67,26 @@ public class PremioServiceImpl implements PremioService {
     }
 
     @Override
+    public List<Premio> findByCategoria(@NotNull(message = "Categoria não pode ser nula") String categoria) {
+        if (categoria == null || categoria.trim().isEmpty()) {
+            throw new IllegalArgumentException("Categoria não pode ser vazia");
+        }
+        return repository.findByCategoria(categoria).list();
+    }
+
+    @Override
     @Transactional
     public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Premio premio) {
         Premio p = findById(id);
-        
+
         if (premio.getNome() != null && !premio.getNome().trim().isEmpty()) {
             p.setNome(premio.getNome());
         }
         if (premio.getAno() != null) {
             p.setAno(premio.getAno());
+        }
+        if (premio.getCategoria() != null) {
+            p.setCategoria(premio.getCategoria());
         }
     }
 }

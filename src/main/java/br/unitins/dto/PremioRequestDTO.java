@@ -2,7 +2,6 @@ package br.unitins.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
@@ -12,7 +11,9 @@ public record PremioRequestDTO(
     String nome,
     
     @NotNull(message = "Ano é obrigatório")
-    @PastOrPresent(message = "Ano não pode ser futuro")
     @Positive(message = "Ano deve ser positivo")
-    Integer ano
+    Integer ano,
+    
+    @Size(max = 50, message = "Categoria deve ter no máximo 50 caracteres")
+    String categoria
 ) {}

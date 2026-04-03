@@ -11,4 +11,8 @@ public class PremioRepository implements PanacheRepository<Premio> {
     public PanacheQuery<Premio> findByNome(String nome) {
         return find("UPPER(nome) LIKE UPPER(?1)", "%" + nome + "%");
     }
+    
+    public PanacheQuery<Premio> findByCategoria(String categoria) {
+        return find("UPPER(categoria) LIKE UPPER(?1)", "%" + categoria + "%");
+    }
 }
