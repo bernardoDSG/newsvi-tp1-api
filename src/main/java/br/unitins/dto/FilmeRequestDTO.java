@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
@@ -25,7 +24,6 @@ public record FilmeRequestDTO(
     String idiomaOriginal,
     
     @NotNull(message = "Ano de lançamento é obrigatório")
-    @PastOrPresent(message = "Ano de lançamento não pode ser futuro")
     @Positive(message = "Ano de lançamento deve ser positivo")
     Integer anoLancamento,
     

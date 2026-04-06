@@ -33,7 +33,7 @@ public class FilmeMapper {
             filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
             filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
             filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-            null // prêmios do filme - se tiver relação no futuro
+            null  // <-- Mantém null, será preenchido no Resource
         );
     }
 }

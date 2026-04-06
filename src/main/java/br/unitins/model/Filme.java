@@ -2,57 +2,40 @@ package br.unitins.model;
 
 import java.util.List;
 
-import br.unitins.converter.ClassificacaoIndicativaConverter;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 
 @Entity
-public class Filme extends DefaultEntity{
+public class Filme extends DefaultEntity {
     private String nome;
     private String duracao;
     private String sinopse;
     private String idiomaOriginal;
     private Integer anoLancamento;
-    @Convert(converter = ClassificacaoIndicativaConverter.class)
     private ClassificacaoIndicativa classificacaoIndicativa;
+    
     @ManyToMany
     @JoinTable(name = "filme_genero", 
                joinColumns = @JoinColumn(name = "filme_id"), 
                inverseJoinColumns = @JoinColumn(name = "genero_id"))
     private List<Genero> generos;
+    
     @ManyToMany
     @JoinTable(name = "filme_ator",
                joinColumns = @JoinColumn(name = "filme_id"),
                inverseJoinColumns = @JoinColumn(name = "ator_id"))
     private List<Ator> atores;
+    
+    @OneToMany
+    @JoinTable(name = "filme_premio",
+               joinColumns = @JoinColumn(name = "filme_id"),
+               inverseJoinColumns = @JoinColumn(name = "premio_id"))
+    private List<Premio> premios;
 
-    public ClassificacaoIndicativa getClassificacaoIndicativa() {
-        return classificacaoIndicativa;
-    }
-
-    public void setClassificacaoIndicativa(ClassificacaoIndicativa classificacaoIndicativa) {
-        this.classificacaoIndicativa = classificacaoIndicativa;
-    }
-
-    public List<Genero> getGeneros() {
-        return generos;
-    }
-
-    public void setGeneros(List<Genero> generos) {
-        this.generos = generos;
-    }
-
-    public List<Ator> getAtores() {
-        return atores;
-    }
-
-    public void setAtores(List<Ator> atores) {
-        this.atores = atores;
-    }
-
+    // Getters e Setters
     public String getNome() {
         return nome;
     }
@@ -93,4 +76,35 @@ public class Filme extends DefaultEntity{
         this.anoLancamento = anoLancamento;
     }
 
+    public ClassificacaoIndicativa getClassificacaoIndicativa() {
+        return classificacaoIndicativa;
+    }
+
+    public void setClassificacaoIndicativa(ClassificacaoIndicativa classificacaoIndicativa) {
+        this.classificacaoIndicativa = classificacaoIndicativa;
+    }
+
+    public List<Genero> getGeneros() {
+        return generos;
+    }
+
+    public void setGeneros(List<Genero> generos) {
+        this.generos = generos;
+    }
+
+    public List<Ator> getAtores() {
+        return atores;
+    }
+
+    public void setAtores(List<Ator> atores) {
+        this.atores = atores;
+    }
+
+    public List<Premio> getPremios() {
+        return premios;
+    }
+
+    public void setPremios(List<Premio> premios) {
+        this.premios = premios;
+    }
 }
