@@ -11,6 +11,7 @@ public class SalaMapper {
             return null;
         }
         Sala sala = new Sala();
+        sala.setCapacidade(dto.capacidade());
         return sala;
     }
 
@@ -20,6 +21,7 @@ public class SalaMapper {
         }
         return new SalaResponseDTO(
             sala.getId(),
+            sala.getCapacidade(),
             sala.getPoltronas() != null ? sala.getPoltronas().stream().map(p -> p.getCodigo()).toList() : null
         );
     }

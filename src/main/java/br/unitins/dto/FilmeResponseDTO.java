@@ -6,11 +6,14 @@ public record FilmeResponseDTO(
     Long id,
     String nome,
     String duracao,
+    Integer duracaoMinutos,
     String sinopse,
     String idiomaOriginal,
     Integer anoLancamento,
+    String imagemPoster,
+    String trailerUrl,
     String classificacaoIndicativa,
     List<String> generos,
     List<String> atores,
-    List<PremioResponseDTO> premios  // <-- Tem que ser List<PremioResponseDTO>
+    List<PremioResponseDTO> premios
 ) {}

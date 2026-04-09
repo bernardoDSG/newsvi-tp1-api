@@ -1,5 +1,6 @@
 package br.unitins.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import br.unitins.model.Sessao;
@@ -12,4 +13,6 @@ public interface SessaoService {
     Sessao create(@Valid Sessao sessao);
     void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Sessao sessao);
     void delete(@NotNull(message = "ID não pode ser nulo") Long id);
+    
+    boolean existsBySalaAndHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim);
 }

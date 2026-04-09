@@ -12,6 +12,7 @@ public interface FilmeService {
     List<Filme> findByNome(@NotNull(message = "Nome não pode ser nulo") String nome);
     List<Filme> findByGenero(@NotNull(message = "Gênero não pode ser nulo") String genero);
     List<Filme> findByAtor(@NotNull(message = "Ator não pode ser nulo") String ator);
+    List<Filme> findByDuracaoBetween(Integer minMinutos, Integer maxMinutos); // NOVO
     Filme create(@Valid Filme filme);
     void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Filme filme);
     void delete(@NotNull(message = "ID não pode ser nulo") Long id);

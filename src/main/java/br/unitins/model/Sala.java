@@ -9,9 +9,19 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class Sala extends DefaultEntity {
+    private Integer capacidade;  // NOVO - capacidade total da sala
+    
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "sala_id")
-    List<Poltrona> poltronas;
+    private List<Poltrona> poltronas;
+
+    public Integer getCapacidade() {
+        return capacidade;
+    }
+
+    public void setCapacidade(Integer capacidade) {
+        this.capacidade = capacidade;
+    }
 
     public List<Poltrona> getPoltronas() {
         return poltronas;

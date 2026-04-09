@@ -1,8 +1,10 @@
 package br.unitins.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import br.unitins.model.Sessao;
+import br.unitins.model.StatusSessao;
 import br.unitins.repository.SessaoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -35,6 +37,23 @@ public class SessaoServiceImpl implements SessaoService {
         if (sessao.getTipo() == null) {
             throw new IllegalArgumentException("Tipo de sessão é obrigatório");
         }
+        if (sessao.getPreco() == null || sessao.getPreco() <= 0) {
+            throw new IllegalArgumentException("Preço deve ser maior que zero");
+        }
+        if (sessao.getCapacidadeTotal() == null || sessao.getCapacidadeTotal() <= 0) {
+            throw new IllegalArgumentException("Capacidade total deve ser maior que zero");
+        }
+        
+        // CORRIGIDO: Status agora é enum, não String
+        if (sessao.getStatus() == null) {
+            sessao.setStatus(StatusSessao.EM_BREVE); // valor padrão
+        }
+
+        // Se capacidade disponível não foi informada, usa a capacidade total
+        if (sessao.getCapacidadeDisponivel() == null) {
+            sessao.setCapacidadeDisponivel(sessao.getCapacidadeTotal());
+        }
+
         repository.persist(sessao);
         return sessao;
     }
@@ -68,10 +87,21 @@ public class SessaoServiceImpl implements SessaoService {
     }
 
     @Override
+    public boolean existsBySalaAndHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim) {
+        long count = repository.find("SELECT COUNT(s) FROM Sessao s JOIN s.salas sala " +
+                "WHERE sala.id = ?1 AND " +
+                "((s.inicio BETWEEN ?2 AND ?3) OR " +
+                "(s.fim BETWEEN ?2 AND ?3) OR " +
+                "(?2 BETWEEN s.inicio AND s.fim))",
+                salaId, inicio, fim).count();
+        return count > 0;
+    }
+
+    @Override
     @Transactional
     public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Sessao sessao) {
         Sessao s = findById(id);
-        
+
         if (sessao.getInicio() != null) {
             s.setInicio(sessao.getInicio());
         }
@@ -87,7 +117,20 @@ public class SessaoServiceImpl implements SessaoService {
         if (sessao.getSalas() != null) {
             s.setSalas(sessao.getSalas());
         }
-        
+        if (sessao.getPreco() != null && sessao.getPreco() > 0) {
+            s.setPreco(sessao.getPreco());
+        }
+        if (sessao.getCapacidadeTotal() != null && sessao.getCapacidadeTotal() > 0) {
+            s.setCapacidadeTotal(sessao.getCapacidadeTotal());
+        }
+        if (sessao.getCapacidadeDisponivel() != null) {
+            s.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel());
+        }
+        // CORRIGIDO: Status agora é enum
+        if (sessao.getStatus() != null) {
+            s.setStatus(sessao.getStatus());
+        }
+
         if (s.getInicio() != null && s.getFim() != null && s.getInicio().isAfter(s.getFim())) {
             throw new IllegalArgumentException("Horário de início não pode ser após o horário de fim");
         }

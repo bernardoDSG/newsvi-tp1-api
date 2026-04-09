@@ -16,6 +16,9 @@ public record FilmeRequestDTO(
     @Size(min = 1, max = 20, message = "Duração deve ter entre 1 e 20 caracteres")
     String duracao,
     
+    @Positive(message = "Duração em minutos deve ser positiva")
+    Integer duracaoMinutos,
+    
     @NotBlank(message = "Sinopse é obrigatória")
     @Size(min = 10, max = 2000, message = "Sinopse deve ter entre 10 e 2000 caracteres")
     String sinopse,
@@ -26,6 +29,12 @@ public record FilmeRequestDTO(
     @NotNull(message = "Ano de lançamento é obrigatório")
     @Positive(message = "Ano de lançamento deve ser positivo")
     Integer anoLancamento,
+    
+    @Size(max = 500, message = "URL do poster deve ter no máximo 500 caracteres")
+    String imagemPoster,
+    
+    @Size(max = 500, message = "URL do trailer deve ter no máximo 500 caracteres")
+    String trailerUrl,
     
     @NotNull(message = "Classificação indicativa é obrigatória")
     @Positive(message = "ID da classificação deve ser positivo")

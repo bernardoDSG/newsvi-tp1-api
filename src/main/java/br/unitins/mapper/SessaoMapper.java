@@ -3,6 +3,7 @@ package br.unitins.mapper;
 import br.unitins.dto.SessaoRequestDTO;
 import br.unitins.dto.SessaoResponseDTO;
 import br.unitins.model.Sessao;
+import br.unitins.model.StatusSessao;
 
 public class SessaoMapper {
    
@@ -13,6 +14,14 @@ public class SessaoMapper {
         Sessao sessao = new Sessao();
         sessao.setInicio(dto.inicio());
         sessao.setFim(dto.fim());
+        sessao.setPreco(dto.preco());
+        sessao.setCapacidadeTotal(dto.capacidadeTotal());
+        sessao.setCapacidadeDisponivel(dto.capacidadeDisponivel());
+        
+        if (dto.statusId() != null) {
+            sessao.setStatus(StatusSessao.valueOf(dto.statusId()));
+        }
+        
         return sessao;
     }
 
@@ -24,6 +33,11 @@ public class SessaoMapper {
             sessao.getId(),
             sessao.getInicio(),
             sessao.getFim(),
+            sessao.getPreco(),
+            sessao.getCapacidadeTotal(),
+            sessao.getCapacidadeDisponivel(),
+            sessao.getStatus() != null ? sessao.getStatus().name() : null,
+            sessao.getStatus() != null ? sessao.getStatus().getNome() : null,
             sessao.getFilme() != null ? sessao.getFilme().getNome() : null,
             sessao.getTipo() != null ? sessao.getTipo().getNOME() : null,
             sessao.getSalas() != null ? sessao.getSalas().stream().map(s -> s.getId()).toList() : null
