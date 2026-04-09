@@ -14,10 +14,7 @@ public record FilmeRequestDTO(
     
     @NotBlank(message = "Duração é obrigatória")
     @Size(min = 1, max = 20, message = "Duração deve ter entre 1 e 20 caracteres")
-    String duracao,
-    
-    @Positive(message = "Duração em minutos deve ser positiva")
-    Integer duracaoMinutos,
+    String duracao,  // ← SÓ ISSO, sem duracaoMinutos
     
     @NotBlank(message = "Sinopse é obrigatória")
     @Size(min = 10, max = 2000, message = "Sinopse deve ter entre 10 e 2000 caracteres")

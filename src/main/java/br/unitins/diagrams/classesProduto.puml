@@ -1,5 +1,5 @@
 @startuml diagrama
-title Diagrama de Classes - CRUD's Administrativos
+title Diagrama de Classes - CRUD's Administrativos (Versão Atualizada)
 caption Aluno: Bernardo dos Santos Graça
 
 ' --------------------
@@ -9,16 +9,52 @@ caption Aluno: Bernardo dos Santos Graça
 class Filme {
     - nome : String
     - duracao : String
+    - duracaoMinutos : Integer
     - sinopse : String
     - idiomaOriginal : String 
     - anoLancamento : Integer
+    - imagemPoster : String
+    - trailerUrl : String
 }
+
+class Ator {
+    - nome : String
+}
+
+class Genero {
+    - nome : String
+}
+
+class Premio {
+    - nome : String
+    - categoria : String
+    - ano : Integer
+}
+
+class Sala {
+    - capacidade : Integer
+}
+
+class Poltrona {
+    - codigo : String
+}
+
+class Sessao {
+    - inicio : LocalDateTime
+    - fim : LocalDateTime
+    - preco : Double
+    - capacidadeTotal : Integer
+    - capacidadeDisponivel : Integer
+}
+
+' --------------------
+' Enums
+' --------------------
 
 enum Disponibilidade {
     DISPONIVEL
     INDISPONIVEL
 }
-
 
 enum TipoSessao {
     DUBLADA
@@ -34,48 +70,30 @@ enum ClassificacaoIndicativa {
     DEZOITO
 }
 
-class Premio {
-    - nome : String
-    - categoria : String
-    - ano : Integer
+enum StatusSessao {
+    EM_BREVE
+    EM_EXIBICAO
+    ENCERRADO
+    CANCELADA
 }
-
-class Genero {
-    - nome : String
-}
-
-
-class Ator {
-    - nome : String
-}
-
-
-
-class Sessao {
-    - horarioInicio : LocalDateTime
-    - horarioFim : LocalDateTime
-
-}
-
-class Sala {
-}
-
-class Poltrona {
-    - codigo : String
-}
-
 
 ' --------------------
 ' Relacionamentos
 ' --------------------
-Filme "*" --> "*" Ator : atoresPrincipais
-Filme "*" --> "*" Genero : genero
-Sessao "*" --> "1" TipoSessao : tipoSessao
-Sessao "*" --> "*" Sala : salas
-Sala "1" *--> "*" Poltrona : poltronas
-Sessao "*" o--> "1" Filme : filme
+Filme "*" --> "*" Ator : atores
+Filme "*" --> "*" Genero : generos
+Filme "1" --> "0..*" Premio : premios
 Filme "*" --> "1" ClassificacaoIndicativa : classificacaoIndicativa
+
+Ator "1" --> "0..*" Premio : premios
+
+Sessao "*" --> "1" TipoSessao : tipo
+Sessao "*" --> "1" StatusSessao : status
+Sessao "*" --> "1" Filme : filme
+Sessao "*" --> "*" Sala : salas
+
+Sala "1" *--> "*" Poltrona : poltronas
+
 Poltrona "*" --> "1" Disponibilidade : disponibilidade
-Ator"1" --> "0..*" Premio : premios
-Filme"1" --> "0..*" Premio : premios
+
 @enduml

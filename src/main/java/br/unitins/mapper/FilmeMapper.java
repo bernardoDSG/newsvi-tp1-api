@@ -13,7 +13,8 @@ public class FilmeMapper {
         Filme filme = new Filme();
         filme.setNome(dto.nome());
         filme.setDuracao(dto.duracao());
-        filme.setDuracaoMinutos(dto.duracaoMinutos());
+        // REMOVIDO: filme.setDuracaoMinutos(dto.duracaoMinutos());
+        // A duracaoMinutos será calculada automaticamente no setDuracao() da entidade
         filme.setSinopse(dto.sinopse());
         filme.setIdiomaOriginal(dto.idiomaOriginal());
         filme.setAnoLancamento(dto.anoLancamento());
@@ -30,7 +31,7 @@ public class FilmeMapper {
             filme.getId(),
             filme.getNome(),
             filme.getDuracao(),
-            filme.getDuracaoMinutos(),
+            filme.getDuracaoMinutos(),  // ← OK: no ResponseDTO isso existe
             filme.getSinopse(),
             filme.getIdiomaOriginal(),
             filme.getAnoLancamento(),
@@ -39,7 +40,9 @@ public class FilmeMapper {
             filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
             filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
             filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-            null
+            filme.getPremios() != null ? filme.getPremios().stream()
+                .map(PremioMapper::toResponseDTO)
+                .toList() : null
         );
     }
 }

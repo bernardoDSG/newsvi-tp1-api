@@ -11,3 +11,4 @@ insert into premio (nome,ano,categoria) values('Oscar',2020,'Melhor Ator Coadjuv
 
 insert into genero (nome) values('Drama');
 insert into genero (nome) values('Histórico');
+
