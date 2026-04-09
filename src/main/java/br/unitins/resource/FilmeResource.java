@@ -46,6 +46,7 @@ public class FilmeResource {
     PremioRepository premioRepository;
 
     // ==================== GET (buscar todos) ====================
+    @SuppressWarnings("null")
     @GET
     public Response buscarTodos() {
         List<FilmeResponseDTO> list = service.findAll().stream()
@@ -53,9 +54,12 @@ public class FilmeResource {
                         filme.getId(),
                         filme.getNome(),
                         filme.getDuracao(),
+                        filme.getDuracaoMinutos(),
                         filme.getSinopse(),
                         filme.getIdiomaOriginal(),
                         filme.getAnoLancamento(),
+                        filme.getImagemPoster(),
+                        filme.getTrailerUrl(),
                         filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
                                 : null,
                         filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
@@ -82,9 +86,12 @@ public class FilmeResource {
                 filme.getId(),
                 filme.getNome(),
                 filme.getDuracao(),
+                filme.getDuracaoMinutos(),
                 filme.getSinopse(),
                 filme.getIdiomaOriginal(),
                 filme.getAnoLancamento(),
+                filme.getImagemPoster(),
+                filme.getTrailerUrl(),
                 filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
                 filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
                 filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
@@ -96,6 +103,7 @@ public class FilmeResource {
     }
 
     // ==================== GET (buscar por nome) ====================
+    @SuppressWarnings("null")
     @GET
     @Path("/find/{nome}")
     public Response buscarPeloNome(@PathParam("nome") String nome) {
@@ -104,9 +112,12 @@ public class FilmeResource {
                         filme.getId(),
                         filme.getNome(),
                         filme.getDuracao(),
+                        filme.getDuracaoMinutos(),
                         filme.getSinopse(),
                         filme.getIdiomaOriginal(),
                         filme.getAnoLancamento(),
+                        filme.getImagemPoster(),
+                        filme.getTrailerUrl(),
                         filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
                                 : null,
                         filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
@@ -125,6 +136,7 @@ public class FilmeResource {
     }
 
     // ==================== GET (buscar por gênero) ====================
+    @SuppressWarnings("null")
     @GET
     @Path("/genero/{genero}")
     public Response buscarPorGenero(@PathParam("genero") String genero) {
@@ -133,9 +145,12 @@ public class FilmeResource {
                         filme.getId(),
                         filme.getNome(),
                         filme.getDuracao(),
+                        filme.getDuracaoMinutos(),
                         filme.getSinopse(),
                         filme.getIdiomaOriginal(),
                         filme.getAnoLancamento(),
+                        filme.getImagemPoster(),
+                        filme.getTrailerUrl(),
                         filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
                                 : null,
                         filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
@@ -153,7 +168,41 @@ public class FilmeResource {
         return Response.ok(list).build();
     }
 
-    // NOVO endpoint: GET /filmes/duracao?min=90&max=150
+    // ==================== GET (buscar por ator) ====================
+    @SuppressWarnings("null")
+    @GET
+    @Path("/ator/{ator}")
+    public Response buscarPorAtor(@PathParam("ator") String ator) {
+        List<FilmeResponseDTO> list = service.findByAtor(ator).stream()
+                .map(filme -> new FilmeResponseDTO(
+                        filme.getId(),
+                        filme.getNome(),
+                        filme.getDuracao(),
+                        filme.getDuracaoMinutos(),
+                        filme.getSinopse(),
+                        filme.getIdiomaOriginal(),
+                        filme.getAnoLancamento(),
+                        filme.getImagemPoster(),
+                        filme.getTrailerUrl(),
+                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
+                                : null,
+                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
+                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
+                        filme.getPremios() != null ? filme.getPremios().stream()
+                                .map(PremioMapper::toResponseDTO)
+                                .toList() : null))
+                .toList();
+
+        if (list.isEmpty()) {
+            return Response.status(Status.NOT_FOUND)
+                    .entity("Nenhum filme encontrado para o ator: " + ator)
+                    .build();
+        }
+        return Response.ok(list).build();
+    }
+
+    // ==================== GET (buscar por duração) ====================
+    @SuppressWarnings("null")
     @GET
     @Path("/duracao")
     public Response buscarPorDuracao(
@@ -192,35 +241,6 @@ public class FilmeResource {
                                 .toList() : null))
                 .toList();
 
-        return Response.ok(list).build();
-    }
-
-    // ==================== GET (buscar por ator) ====================
-    @GET
-    @Path("/ator/{ator}")
-    public Response buscarPorAtor(@PathParam("ator") String ator) {
-        List<FilmeResponseDTO> list = service.findByAtor(ator).stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
-
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                    .entity("Nenhum filme encontrado para o ator: " + ator)
-                    .build();
-        }
         return Response.ok(list).build();
     }
 
@@ -275,9 +295,12 @@ public class FilmeResource {
                     filme.getId(),
                     filme.getNome(),
                     filme.getDuracao(),
+                    filme.getDuracaoMinutos(),
                     filme.getSinopse(),
                     filme.getIdiomaOriginal(),
                     filme.getAnoLancamento(),
+                    filme.getImagemPoster(),
+                    filme.getTrailerUrl(),
                     filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
                     filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
                     filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
@@ -362,9 +385,12 @@ public class FilmeResource {
                     filmeAtualizado.getId(),
                     filmeAtualizado.getNome(),
                     filmeAtualizado.getDuracao(),
+                    filmeAtualizado.getDuracaoMinutos(),
                     filmeAtualizado.getSinopse(),
                     filmeAtualizado.getIdiomaOriginal(),
                     filmeAtualizado.getAnoLancamento(),
+                    filmeAtualizado.getImagemPoster(),
+                    filmeAtualizado.getTrailerUrl(),
                     filmeAtualizado.getClassificacaoIndicativa() != null
                             ? filmeAtualizado.getClassificacaoIndicativa().getNOME()
                             : null,
