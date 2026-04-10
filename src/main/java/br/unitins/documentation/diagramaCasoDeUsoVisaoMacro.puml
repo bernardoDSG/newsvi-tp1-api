@@ -1,0 +1,45 @@
+@startuml diagramaCasoUsoVisaoMacro
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as admin
+
+rectangle "Sistema de Cinema" {
+  
+  package "CRUD Filmes" {
+    usecase "Gerenciar Filmes" as UC_FILME
+  }
+  
+  package "CRUD Atores" {
+    usecase "Gerenciar Atores" as UC_ATOR
+  }
+  
+  package "CRUD Gêneros" {
+    usecase "Gerenciar Gêneros" as UC_GENERO
+  }
+  
+  package "CRUD Salas" {
+    usecase "Gerenciar Salas" as UC_SALA
+  }
+  
+  package "CRUD Poltronas" {
+    usecase "Gerenciar Poltronas" as UC_POLTRONA
+  }
+  
+  package "CRUD Sessões" {
+    usecase "Gerenciar Sessões" as UC_sESSAO
+  }
+  
+  package "CRUD Prêmios" {
+    usecase "Gerenciar Prêmios" as UC_PREMIO
+  }
+  
+  admin --> UC_FILME
+  admin --> UC_ATOR
+  admin --> UC_GENERO
+  admin --> UC_SALA
+  admin --> UC_POLTRONA
+  admin --> UC_sESSAO
+  admin --> UC_PREMIO
+}
+@enduml

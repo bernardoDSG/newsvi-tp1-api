@@ -1,0 +1,37 @@
+@startuml diagramaCasoDeUsoPorModulo
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Administrador" as admin
+
+rectangle "Módulo: Filmes" {
+  
+  usecase "Cadastrar Filme" as UC01
+  usecase "Editar Filme" as UC02
+  usecase "Excluir Filme" as UC03
+  usecase "Listar Filmes" as UC04
+  usecase "Buscar por Nome" as UC05
+  usecase "Buscar por Gênero" as UC06
+  usecase "Buscar por Ator" as UC07
+  usecase "Buscar por Duração" as UC08
+  usecase "Associar Gêneros" as UC09
+  usecase "Associar Atores" as UC10
+  usecase "Associar Prêmios" as UC11
+  
+  admin --> UC01
+  admin --> UC02
+  admin --> UC03
+  admin --> UC04
+  admin --> UC05
+  admin --> UC06
+  admin --> UC07
+  admin --> UC08
+  admin --> UC09
+  admin --> UC10
+  admin --> UC11
+  
+  UC01 ..> UC09 : <<include>>
+  UC01 ..> UC10 : <<include>>
+  UC01 ..> UC11 : <<include>>
+}
+@enduml

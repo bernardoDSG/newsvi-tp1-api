@@ -1,0 +1,98 @@
+@startuml diagramaCasoUsoCompleto
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Administrador" as admin
+
+rectangle "Sistema de Cinema\n(Parte Administrativa)" {
+  
+  ' ==================== FILMES ====================
+  usecase "Cadastrar Filme" as UC01
+  usecase "Editar Filme" as UC02
+  usecase "Excluir Filme" as UC03
+  usecase "Listar Filmes" as UC04
+  usecase "Buscar Filme por Nome" as UC05
+  usecase "Buscar Filme por Gênero" as UC06
+  usecase "Buscar Filme por Ator" as UC07
+  usecase "Buscar Filme por Duração" as UC08
+  
+  ' ==================== ATORES ====================
+  usecase "Cadastrar Ator" as UC09
+  usecase "Editar Ator" as UC10
+  usecase "Excluir Ator" as UC11
+  usecase "Listar Atores" as UC12
+  usecase "Buscar Ator por Nome" as UC13
+  
+  ' ==================== GÊNEROS ====================
+  usecase "Cadastrar Gênero" as UC14
+  usecase "Editar Gênero" as UC15
+  usecase "Excluir Gênero" as UC16
+  usecase "Listar Gêneros" as UC17
+  
+  ' ==================== SALAS ====================
+  usecase "Cadastrar Sala" as UC18
+  usecase "Editar Sala" as UC19
+  usecase "Excluir Sala" as UC20
+  usecase "Listar Salas" as UC21
+  
+  ' ==================== POLTRONAS ====================
+  usecase "Cadastrar Poltrona" as UC22
+  usecase "Editar Poltrona" as UC23
+  usecase "Excluir Poltrona" as UC24
+  usecase "Listar Poltronas" as UC25
+  usecase "Buscar Poltrona por Código" as UC26
+  
+  ' ==================== SESSÕES ====================
+  usecase "Cadastrar Sessão" as UC27
+  usecase "Editar Sessão" as UC28
+  usecase "Excluir Sessão" as UC29
+  usecase "Listar Sessões" as UC30
+  usecase "Definir Status da Sessão" as UC31
+  
+  ' ==================== PRÊMIOS ====================
+  usecase "Cadastrar Prêmio" as UC32
+  usecase "Editar Prêmio" as UC33
+  usecase "Excluir Prêmio" as UC34
+  usecase "Listar Prêmios" as UC35
+  usecase "Buscar Prêmio por Nome" as UC36
+  
+  ' ==================== RELACIONAMENTOS ====================
+  admin --> UC01
+  admin --> UC02
+  admin --> UC03
+  admin --> UC04
+  admin --> UC05
+  admin --> UC06
+  admin --> UC07
+  admin --> UC08
+  admin --> UC09
+  admin --> UC10
+  admin --> UC11
+  admin --> UC12
+  admin --> UC13
+  admin --> UC14
+  admin --> UC15
+  admin --> UC16
+  admin --> UC17
+  admin --> UC18
+  admin --> UC19
+  admin --> UC20
+  admin --> UC21
+  admin --> UC22
+  admin --> UC23
+  admin --> UC24
+  admin --> UC25
+  admin --> UC26
+  admin --> UC27
+  admin --> UC28
+  admin --> UC29
+  admin --> UC30
+  admin --> UC31
+  admin --> UC32
+  admin --> UC33
+  admin --> UC34
+  admin --> UC35
+  admin --> UC36
+}
+@enduml

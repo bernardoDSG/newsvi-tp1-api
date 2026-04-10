@@ -1,0 +1,98 @@
+@startuml requisitosFuncionaisAdmin
+title Requisitos Funcionais - Sistema de Cinema (Parte Administrativa)
+
+left to right direction
+
+' ==================== MÓDULO: FILMES ====================
+rectangle "MÓDULO: FILMES (RF01 a RF14)" {
+  
+  usecase "RF01: Cadastrar filme com nome, duração, sinopse, idioma, ano, classificação, poster e trailer" as RF01
+  usecase "RF02: Associar um ou mais gêneros a um filme" as RF02
+  usecase "RF03: Associar um ou mais atores a um filme" as RF03
+  usecase "RF04: Associar um ou mais prêmios a um filme" as RF04
+  usecase "RF05: Editar os dados de um filme" as RF05
+  usecase "RF06: Excluir um filme" as RF06
+  usecase "RF07: Listar todos os filmes" as RF07
+  usecase "RF08: Buscar um filme por ID" as RF08
+  usecase "RF09: Buscar filmes por nome (busca parcial)" as RF09
+  usecase "RF10: Buscar filmes por gênero" as RF10
+  usecase "RF11: Buscar filmes por ator" as RF11
+  usecase "RF12: Buscar filmes por faixa de duração" as RF12
+  usecase "RF13: Converter duração (String) para minutos ao salvar" as RF13
+  usecase "RF14: Validar ano de lançamento não futuro" as RF14
+}
+
+' ==================== MÓDULO: ATORES ====================
+rectangle "MÓDULO: ATORES (RF15 a RF22)" {
+  
+  usecase "RF15: Cadastrar um ator com nome" as RF15
+  usecase "RF16: Associar um ou mais prêmios a um ator" as RF16
+  usecase "RF17: Editar os dados de um ator" as RF17
+  usecase "RF18: Excluir um ator" as RF18
+  usecase "RF19: Listar todos os atores" as RF19
+  usecase "RF20: Buscar um ator por ID" as RF20
+  usecase "RF21: Buscar atores por nome" as RF21
+  usecase "RF22: Buscar atores por prêmio" as RF22
+}
+
+' ==================== MÓDULO: GÊNEROS ====================
+rectangle "MÓDULO: GÊNEROS (RF23 a RF28)" {
+  
+  usecase "RF23: Cadastrar um gênero com nome" as RF23
+  usecase "RF24: Editar os dados de um gênero" as RF24
+  usecase "RF25: Excluir um gênero" as RF25
+  usecase "RF26: Listar todos os gêneros" as RF26
+  usecase "RF27: Buscar um gênero por ID" as RF27
+  usecase "RF28: Buscar gêneros por nome" as RF28
+}
+
+' ==================== MÓDULO: SALAS ====================
+rectangle "MÓDULO: SALAS (RF29 a RF34)" {
+  
+  usecase "RF29: Cadastrar uma sala com capacidade total" as RF29
+  usecase "RF30: Associar poltronas a uma sala" as RF30
+  usecase "RF31: Editar os dados de uma sala" as RF31
+  usecase "RF32: Excluir uma sala" as RF32
+  usecase "RF33: Listar todas as salas" as RF33
+  usecase "RF34: Buscar uma sala por ID" as RF34
+}
+
+' ==================== MÓDULO: POLTRONAS ====================
+rectangle "MÓDULO: POLTRONAS (RF35 a RF41)" {
+  
+  usecase "RF35: Cadastrar poltrona com código e disponibilidade" as RF35
+  usecase "RF36: Editar dados de uma poltrona" as RF36
+  usecase "RF37: Excluir uma poltrona" as RF37
+  usecase "RF38: Listar todas as poltronas" as RF38
+  usecase "RF39: Buscar poltrona por ID" as RF39
+  usecase "RF40: Buscar poltronas por código" as RF40
+  usecase "RF41: Buscar poltronas por disponibilidade" as RF41
+}
+
+' ==================== MÓDULO: SESSÕES ====================
+rectangle "MÓDULO: SESSÕES (RF42 a RF50)" {
+  
+  usecase "RF42: Cadastrar sessão com horários, preço, capacidade, filme, tipo e status" as RF42
+  usecase "RF43: Associar salas a uma sessão" as RF43
+  usecase "RF44: Editar dados de uma sessão" as RF44
+  usecase "RF45: Excluir uma sessão" as RF45
+  usecase "RF46: Listar todas as sessões" as RF46
+  usecase "RF47: Buscar sessão por ID" as RF47
+  usecase "RF48: Validar horário início não após fim" as RF48
+  usecase "RF49: Validar preço maior que zero" as RF49
+  usecase "RF50: Definir status da sessão" as RF50
+}
+
+' ==================== MÓDULO: PRÊMIOS ====================
+rectangle "MÓDULO: PRÊMIOS (RF51 a RF57)" {
+  
+  usecase "RF51: Cadastrar prêmio com nome, ano e categoria" as RF51
+  usecase "RF52: Editar dados de um prêmio" as RF52
+  usecase "RF53: Excluir um prêmio" as RF53
+  usecase "RF54: Listar todos os prêmios" as RF54
+  usecase "RF55: Buscar prêmio por ID" as RF55
+  usecase "RF56: Buscar prêmios por nome" as RF56
+  usecase "RF57: Buscar prêmios por categoria" as RF57
+}
+
+@enduml
