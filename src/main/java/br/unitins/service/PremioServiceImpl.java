@@ -7,8 +7,6 @@ import br.unitins.repository.PremioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     @Transactional
-    public Premio create(@Valid Premio premio) {
+    public Premio create(Premio premio) {
         if (premio.getNome() == null || premio.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do prêmio é obrigatório");
         }
@@ -32,7 +30,10 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Prêmio não encontrado com ID: " + id);
         }
@@ -45,6 +46,9 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     public Premio findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Premio premio = repository.findById(id);
         if (premio == null) {
             throw new NotFoundException("Prêmio não encontrado com ID: " + id);
@@ -70,7 +74,10 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Premio premio) {
+    public void update(Long id, Premio premio) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Premio p = findById(id);
         
         if (premio.getNome() != null && !premio.getNome().trim().isEmpty()) {

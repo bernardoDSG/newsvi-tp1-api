@@ -8,8 +8,6 @@ import br.unitins.repository.PremioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -23,7 +21,7 @@ public class AtorServiceImpl implements AtorService {
 
     @Override
     @Transactional
-    public Ator create(@Valid Ator ator) {
+    public Ator create(Ator ator) {
         if (ator.getNome() == null || ator.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do ator é obrigatório");
         }
@@ -33,7 +31,10 @@ public class AtorServiceImpl implements AtorService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Ator não encontrado com ID: " + id);
         }
@@ -46,6 +47,9 @@ public class AtorServiceImpl implements AtorService {
 
     @Override
     public Ator findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Ator ator = repository.findById(id);
         if (ator == null) {
             throw new NotFoundException("Ator não encontrado com ID: " + id);
@@ -71,7 +75,10 @@ public class AtorServiceImpl implements AtorService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Ator ator) {
+    public void update(Long id, Ator ator) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Ator a = findById(id);
         
         if (ator.getNome() != null && !ator.getNome().trim().isEmpty()) {

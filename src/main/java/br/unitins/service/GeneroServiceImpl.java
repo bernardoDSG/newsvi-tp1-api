@@ -7,8 +7,6 @@ import br.unitins.repository.GeneroRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class GeneroServiceImpl implements GeneroService {
 
     @Override
     @Transactional
-    public Genero create(@Valid Genero genero) {
+    public Genero create(Genero genero) {
         if (genero.getNome() == null || genero.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do gênero é obrigatório");
         }
@@ -29,7 +27,10 @@ public class GeneroServiceImpl implements GeneroService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Gênero não encontrado com ID: " + id);
         }
@@ -42,6 +43,9 @@ public class GeneroServiceImpl implements GeneroService {
 
     @Override
     public Genero findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Genero genero = repository.findById(id);
         if (genero == null) {
             throw new NotFoundException("Gênero não encontrado com ID: " + id);
@@ -59,7 +63,10 @@ public class GeneroServiceImpl implements GeneroService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Genero genero) {
+    public void update(Long id, Genero genero) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Genero g = findById(id);
         if (genero.getNome() != null && !genero.getNome().trim().isEmpty()) {
             g.setNome(genero.getNome());

@@ -7,8 +7,6 @@ import br.unitins.repository.PoltronaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class PoltronaServiceImpl implements PoltronaService {
 
     @Override
     @Transactional
-    public Poltrona create(@Valid Poltrona poltrona) {
+    public Poltrona create(Poltrona poltrona) {
         if (poltrona.getCodigo() == null || poltrona.getCodigo().trim().isEmpty()) {
             throw new IllegalArgumentException("Código da poltrona é obrigatório");
         }
@@ -32,7 +30,10 @@ public class PoltronaServiceImpl implements PoltronaService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Poltrona não encontrada com ID: " + id);
         }
@@ -45,6 +46,9 @@ public class PoltronaServiceImpl implements PoltronaService {
 
     @Override
     public Poltrona findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Poltrona poltrona = repository.findById(id);
         if (poltrona == null) {
             throw new NotFoundException("Poltrona não encontrada com ID: " + id);
@@ -78,7 +82,10 @@ public class PoltronaServiceImpl implements PoltronaService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Poltrona poltrona) {
+    public void update(Long id, Poltrona poltrona) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Poltrona p = findById(id);
         
         if (poltrona.getCodigo() != null && !poltrona.getCodigo().trim().isEmpty()) {

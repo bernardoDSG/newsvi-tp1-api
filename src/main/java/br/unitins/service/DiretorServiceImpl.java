@@ -7,8 +7,6 @@ import br.unitins.repository.DiretorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class DiretorServiceImpl implements DiretorService {
 
     @Override
     @Transactional
-    public Diretor create(@Valid Diretor diretor) {
+    public Diretor create(Diretor diretor) {
         if (diretor.getNome() == null || diretor.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do diretor é obrigatório");
         }
@@ -29,7 +27,10 @@ public class DiretorServiceImpl implements DiretorService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Diretor não encontrado com ID: " + id);
         }
@@ -42,6 +43,9 @@ public class DiretorServiceImpl implements DiretorService {
 
     @Override
     public Diretor findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Diretor diretor = repository.findById(id);
         if (diretor == null) {
             throw new NotFoundException("Diretor não encontrado com ID: " + id);
@@ -67,7 +71,10 @@ public class DiretorServiceImpl implements DiretorService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Diretor diretor) {
+    public void update(Long id, Diretor diretor) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Diretor d = findById(id);
         
         if (diretor.getNome() != null && !diretor.getNome().trim().isEmpty()) {

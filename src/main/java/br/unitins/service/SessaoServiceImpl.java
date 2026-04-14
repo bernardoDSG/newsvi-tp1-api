@@ -9,8 +9,6 @@ import br.unitins.repository.SessaoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -21,7 +19,7 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     @Transactional
-    public Sessao create(@Valid Sessao sessao) {
+    public Sessao create(Sessao sessao) {
         if (sessao.getInicio() == null) {
             throw new IllegalArgumentException("Horário de início é obrigatório");
         }
@@ -58,7 +56,10 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Sessão não encontrada com ID: " + id);
         }
@@ -71,6 +72,9 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     public Sessao findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Sessao sessao = repository.findById(id);
         if (sessao == null) {
             throw new NotFoundException("Sessão não encontrada com ID: " + id);
@@ -121,7 +125,10 @@ public class SessaoServiceImpl implements SessaoService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Sessao sessao) {
+    public void update(Long id, Sessao sessao) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Sessao s = findById(id);
 
         if (sessao.getInicio() != null) {

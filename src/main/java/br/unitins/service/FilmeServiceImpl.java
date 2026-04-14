@@ -7,8 +7,6 @@ import br.unitins.repository.FilmeRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class FilmeServiceImpl implements FilmeService {
 
     @Override
     @Transactional
-    public Filme create(@Valid Filme filme) {
+    public Filme create(Filme filme) {
         if (filme.getNome() == null || filme.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do filme é obrigatório");
         }
@@ -35,7 +33,10 @@ public class FilmeServiceImpl implements FilmeService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Filme não encontrado com ID: " + id);
         }
@@ -48,6 +49,9 @@ public class FilmeServiceImpl implements FilmeService {
 
     @Override
     public Filme findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Filme filme = repository.findById(id);
         if (filme == null) {
             throw new NotFoundException("Filme não encontrado com ID: " + id);
@@ -100,7 +104,10 @@ public class FilmeServiceImpl implements FilmeService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Filme filme) {
+    public void update(Long id, Filme filme) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Filme f = findById(id);
         
         if (filme.getNome() != null && !filme.getNome().trim().isEmpty()) {
