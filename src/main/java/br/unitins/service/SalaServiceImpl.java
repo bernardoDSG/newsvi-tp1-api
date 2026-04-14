@@ -7,8 +7,6 @@ import br.unitins.repository.SalaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 
 @ApplicationScoped
@@ -19,7 +17,7 @@ public class SalaServiceImpl implements SalaService {
 
     @Override
     @Transactional
-    public Sala create(@Valid Sala sala) {
+    public Sala create(Sala sala) {
         if (sala.getNumero() == null) {
             throw new IllegalArgumentException("Número da sala é obrigatório");
         }
@@ -32,7 +30,7 @@ public class SalaServiceImpl implements SalaService {
 
     @Override
     @Transactional
-    public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
+    public void delete(Long id) {
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Sala não encontrada com ID: " + id);
         }
@@ -74,7 +72,7 @@ public class SalaServiceImpl implements SalaService {
 
     @Override
     @Transactional
-    public void update(Long id, @Valid Sala sala) {
+    public void update(Long id, Sala sala) {
         Sala s = findById(id);
         
         if (sala.getNumero() != null) {

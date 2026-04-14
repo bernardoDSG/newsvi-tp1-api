@@ -9,17 +9,11 @@ public class ClassificacaoIndicativaConverter implements AttributeConverter<Clas
 
     @Override
     public Long convertToDatabaseColumn(ClassificacaoIndicativa classificacao) {
-        if (classificacao == null) {
-            return null;
-        }
-        return classificacao.getId();
+        return classificacao == null ? null : classificacao.getId();
     }
 
     @Override
     public ClassificacaoIndicativa convertToEntityAttribute(Long id) {
-        if (id == null) {
-            return null;
-        }
         return ClassificacaoIndicativa.valueOf(id);
     }
 }

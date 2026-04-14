@@ -2,22 +2,18 @@ package br.unitins.converter;
 
 import br.unitins.model.Disponibilidade;
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
+@Converter(autoApply = true)
 public class DisponibilidadeConverter implements AttributeConverter<Disponibilidade, Long> {
 
     @Override
     public Long convertToDatabaseColumn(Disponibilidade disponibilidade) {
-        if (disponibilidade == null) {
-            return null;
-        }
-        return disponibilidade.getId();
+        return disponibilidade == null ? null : disponibilidade.getId();
     }
 
     @Override
     public Disponibilidade convertToEntityAttribute(Long id) {
-        if (id == null) {
-            return null;
-        }
         return Disponibilidade.valueOf(id);
     }
 }

@@ -3,6 +3,8 @@ package br.unitins.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.unitins.converter.ClassificacaoIndicativaConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -25,26 +27,20 @@ public class Filme extends DefaultEntity {
     @JoinColumn(name = "diretor_id")
     private Diretor diretor;
 
-    @ManyToOne
-    @JoinColumn(name = "classificacao_id")
+    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
+    @Convert(converter = ClassificacaoIndicativaConverter.class)
     private ClassificacaoIndicativa classificacaoIndicativa;
 
     @ManyToMany
-    @JoinTable(name = "filme_genero", 
-               joinColumns = @JoinColumn(name = "filme_id"), 
-               inverseJoinColumns = @JoinColumn(name = "genero_id"))
+    @JoinTable(name = "filme_genero", joinColumns = @JoinColumn(name = "filme_id"), inverseJoinColumns = @JoinColumn(name = "genero_id"))
     private List<Genero> generos = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "filme_ator",
-               joinColumns = @JoinColumn(name = "filme_id"),
-               inverseJoinColumns = @JoinColumn(name = "ator_id"))
+    @JoinTable(name = "filme_ator", joinColumns = @JoinColumn(name = "filme_id"), inverseJoinColumns = @JoinColumn(name = "ator_id"))
     private List<Ator> atores = new ArrayList<>();
 
     @OneToMany
-    @JoinTable(name = "filme_premio",
-               joinColumns = @JoinColumn(name = "filme_id"),
-               inverseJoinColumns = @JoinColumn(name = "premio_id"))
+    @JoinTable(name = "filme_premio", joinColumns = @JoinColumn(name = "filme_id"), inverseJoinColumns = @JoinColumn(name = "premio_id"))
     private List<Premio> premios = new ArrayList<>();
 
     // Método de conversão de duração
@@ -55,7 +51,7 @@ public class Filme extends DefaultEntity {
         String duracaoLimpa = duracao.toLowerCase().trim().replaceAll("\\s+", "");
         int horas = 0;
         int minutos = 0;
-        
+
         try {
             if (duracaoLimpa.contains("h") && duracaoLimpa.contains("m")) {
                 String[] partes = duracaoLimpa.split("h");
@@ -74,47 +70,108 @@ public class Filme extends DefaultEntity {
     }
 
     // Getters e Setters
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() {
+        return nome;
+    }
 
-    public String getDuracao() { return duracao; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getDuracao() {
+        return duracao;
+    }
+
     public void setDuracao(String duracao) {
         this.duracao = duracao;
         this.duracaoMinutos = converterDuracaoParaMinutos(duracao);
     }
 
-    public Integer getDuracaoMinutos() { return duracaoMinutos; }
-    public void setDuracaoMinutos(Integer duracaoMinutos) { this.duracaoMinutos = duracaoMinutos; }
-
-    public String getSinopse() { return sinopse; }
-    public void setSinopse(String sinopse) { this.sinopse = sinopse; }
-
-    public String getIdiomaOriginal() { return idiomaOriginal; }
-    public void setIdiomaOriginal(String idiomaOriginal) { this.idiomaOriginal = idiomaOriginal; }
-
-    public Integer getAnoLancamento() { return anoLancamento; }
-    public void setAnoLancamento(Integer anoLancamento) { this.anoLancamento = anoLancamento; }
-
-    public String getImagemPoster() { return imagemPoster; }
-    public void setImagemPoster(String imagemPoster) { this.imagemPoster = imagemPoster; }
-
-    public String getTrailerUrl() { return trailerUrl; }
-    public void setTrailerUrl(String trailerUrl) { this.trailerUrl = trailerUrl; }
-
-    public Diretor getDiretor() { return diretor; }
-    public void setDiretor(Diretor diretor) { this.diretor = diretor; }
-
-    public ClassificacaoIndicativa getClassificacaoIndicativa() { return classificacaoIndicativa; }
-    public void setClassificacaoIndicativa(ClassificacaoIndicativa classificacaoIndicativa) { 
-        this.classificacaoIndicativa = classificacaoIndicativa; 
+    public Integer getDuracaoMinutos() {
+        return duracaoMinutos;
     }
 
-    public List<Genero> getGeneros() { return generos; }
-    public void setGeneros(List<Genero> generos) { this.generos = generos; }
+    public void setDuracaoMinutos(Integer duracaoMinutos) {
+        this.duracaoMinutos = duracaoMinutos;
+    }
 
-    public List<Ator> getAtores() { return atores; }
-    public void setAtores(List<Ator> atores) { this.atores = atores; }
+    public String getSinopse() {
+        return sinopse;
+    }
 
-    public List<Premio> getPremios() { return premios; }
-    public void setPremios(List<Premio> premios) { this.premios = premios; }
+    public void setSinopse(String sinopse) {
+        this.sinopse = sinopse;
+    }
+
+    public String getIdiomaOriginal() {
+        return idiomaOriginal;
+    }
+
+    public void setIdiomaOriginal(String idiomaOriginal) {
+        this.idiomaOriginal = idiomaOriginal;
+    }
+
+    public Integer getAnoLancamento() {
+        return anoLancamento;
+    }
+
+    public void setAnoLancamento(Integer anoLancamento) {
+        this.anoLancamento = anoLancamento;
+    }
+
+    public String getImagemPoster() {
+        return imagemPoster;
+    }
+
+    public void setImagemPoster(String imagemPoster) {
+        this.imagemPoster = imagemPoster;
+    }
+
+    public String getTrailerUrl() {
+        return trailerUrl;
+    }
+
+    public void setTrailerUrl(String trailerUrl) {
+        this.trailerUrl = trailerUrl;
+    }
+
+    public Diretor getDiretor() {
+        return diretor;
+    }
+
+    public void setDiretor(Diretor diretor) {
+        this.diretor = diretor;
+    }
+
+    public ClassificacaoIndicativa getClassificacaoIndicativa() {
+        return classificacaoIndicativa;
+    }
+
+    public void setClassificacaoIndicativa(ClassificacaoIndicativa classificacaoIndicativa) {
+        this.classificacaoIndicativa = classificacaoIndicativa;
+    }
+
+    public List<Genero> getGeneros() {
+        return generos;
+    }
+
+    public void setGeneros(List<Genero> generos) {
+        this.generos = generos;
+    }
+
+    public List<Ator> getAtores() {
+        return atores;
+    }
+
+    public void setAtores(List<Ator> atores) {
+        this.atores = atores;
+    }
+
+    public List<Premio> getPremios() {
+        return premios;
+    }
+
+    public void setPremios(List<Premio> premios) {
+        this.premios = premios;
+    }
 }

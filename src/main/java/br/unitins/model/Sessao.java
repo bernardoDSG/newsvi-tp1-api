@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.unitins.converter.StatusSessaoConverter;
+import br.unitins.converter.TipoSessaoConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -18,12 +21,12 @@ public class Sessao extends DefaultEntity {
     private Integer capacidadeTotal;
     private Integer capacidadeDisponivel;
 
-    @ManyToOne
-    @JoinColumn(name = "tipo_sessao_id")
+    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
+    @Convert(converter = TipoSessaoConverter.class)
     private TipoSessao tipo;
 
-    @ManyToOne
-    @JoinColumn(name = "status_sessao_id")
+    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
+    @Convert(converter = StatusSessaoConverter.class)
     private StatusSessao status;
 
     @ManyToOne

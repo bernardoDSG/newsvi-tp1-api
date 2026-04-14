@@ -9,17 +9,11 @@ public class StatusSessaoConverter implements AttributeConverter<StatusSessao, L
 
     @Override
     public Long convertToDatabaseColumn(StatusSessao status) {
-        if (status == null) {
-            return null;
-        }
-        return status.getId();
+        return status == null ? null : status.getId();
     }
 
     @Override
     public StatusSessao convertToEntityAttribute(Long id) {
-        if (id == null) {
-            return null;
-        }
         return StatusSessao.valueOf(id);
     }
 }

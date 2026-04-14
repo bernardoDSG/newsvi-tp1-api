@@ -1,5 +1,7 @@
 package br.unitins.model;
 
+import br.unitins.converter.DisponibilidadeConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -14,8 +16,8 @@ public class Poltrona extends DefaultEntity {
     @JoinColumn(name = "sala_id")
     private Sala sala;
 
-    @ManyToOne
-    @JoinColumn(name = "disponibilidade_id")
+    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
+    @Convert(converter = DisponibilidadeConverter.class)
     private Disponibilidade disponibilidade;
 
     public String getCodigo() { return codigo; }
