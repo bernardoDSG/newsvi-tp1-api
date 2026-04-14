@@ -8,11 +8,11 @@ import br.unitins.model.Poltrona;
 public class PoltronaMapper {
    
     public static Poltrona toEntity(PoltronaRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
+        if (dto == null) return null;
         Poltrona poltrona = new Poltrona();
         poltrona.setCodigo(dto.codigo());
+        poltrona.setLinha(dto.linha());
+        poltrona.setColuna(dto.coluna());
         if (dto.disponibilidadeId() != null) {
             poltrona.setDisponibilidade(Disponibilidade.valueOf(dto.disponibilidadeId()));
         }
@@ -20,13 +20,14 @@ public class PoltronaMapper {
     }
 
     public static PoltronaResponseDTO toResponseDTO(Poltrona poltrona) {
-        if (poltrona == null) {
-            return null;
-        }
+        if (poltrona == null) return null;
         return new PoltronaResponseDTO(
             poltrona.getId(),
             poltrona.getCodigo(),
-            poltrona.getDisponibilidade() != null ? poltrona.getDisponibilidade().getNOME() : null
+            poltrona.getLinha(),
+            poltrona.getColuna(),
+            poltrona.getSala() != null ? String.valueOf(poltrona.getSala().getNumero()) : null,
+            poltrona.getDisponibilidade() != null ? poltrona.getDisponibilidade().getNome() : null
         );
     }
 }

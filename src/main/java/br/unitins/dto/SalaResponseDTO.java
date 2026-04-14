@@ -4,6 +4,8 @@ import java.util.List;
 
 public record SalaResponseDTO(
     Long id,
+    Integer numero,
     Integer capacidade,
+    String cinemaNome,
     List<String> poltronasCodigos
 ) {}

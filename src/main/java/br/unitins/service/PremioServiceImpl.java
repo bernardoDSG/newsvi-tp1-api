@@ -33,9 +33,6 @@ public class PremioServiceImpl implements PremioService {
     @Override
     @Transactional
     public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Prêmio não encontrado com ID: " + id);
         }
@@ -47,10 +44,7 @@ public class PremioServiceImpl implements PremioService {
     }
 
     @Override
-    public Premio findById(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
+    public Premio findById(Long id) {
         Premio premio = repository.findById(id);
         if (premio == null) {
             throw new NotFoundException("Prêmio não encontrado com ID: " + id);
@@ -59,15 +53,15 @@ public class PremioServiceImpl implements PremioService {
     }
 
     @Override
-    public List<Premio> findByNome(@NotNull(message = "Nome não pode ser nulo") String nome) {
+    public List<Premio> findByNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome não pode ser vazio");
         }
         return repository.findByNome(nome).list();
     }
-
+    
     @Override
-    public List<Premio> findByCategoria(@NotNull(message = "Categoria não pode ser nula") String categoria) {
+    public List<Premio> findByCategoria(String categoria) {
         if (categoria == null || categoria.trim().isEmpty()) {
             throw new IllegalArgumentException("Categoria não pode ser vazia");
         }
@@ -76,9 +70,9 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     @Transactional
-    public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Premio premio) {
+    public void update(Long id, @Valid Premio premio) {
         Premio p = findById(id);
-
+        
         if (premio.getNome() != null && !premio.getNome().trim().isEmpty()) {
             p.setNome(premio.getNome());
         }

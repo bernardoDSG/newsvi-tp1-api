@@ -7,21 +7,23 @@ import br.unitins.model.Ator;
 public class AtorMapper {
    
     public static Ator toEntity(AtorRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
+        if (dto == null) return null;
         Ator ator = new Ator();
         ator.setNome(dto.nome());
+        ator.setEmail(dto.email());
+        ator.setTelefone(dto.telefone());
+        ator.setDataNascimento(dto.dataNascimento());
         return ator;
     }
 
     public static AtorResponseDTO toResponseDTO(Ator ator) {
-        if (ator == null) {
-            return null;
-        }
+        if (ator == null) return null;
         return new AtorResponseDTO(
             ator.getId(),
             ator.getNome(),
+            ator.getEmail(),
+            ator.getTelefone(),
+            ator.getDataNascimento(),
             ator.getPremios() != null ? ator.getPremios().stream()
                 .map(PremioMapper::toResponseDTO)
                 .toList() : null

@@ -1,10 +1,48 @@
-@startuml diagrama
-title Diagrama de Classes - CRUD's Administrativos (Versão Atualizada)
+@startuml diagramaClassesAdmin
+title Diagrama de Classes - CRUD's Administrativos 
 caption Aluno: Bernardo dos Santos Graça
 
-' --------------------
-' Classes principais
-' --------------------
+' ==================== CONFIGURAÇÕES ====================
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    FontSize 12
+}
+
+' ==================== HERANÇA ====================
+abstract class Pessoa {
+    - nome : String
+    - email : String
+    - telefone : String
+    + getNome() : String
+    + setNome(String nome) : void
+    + getEmail() : String
+    + setEmail(String email) : void
+    + getTelefone() : String
+    + setTelefone(String telefone) : void
+}
+
+' Herança: Ator e Diretor são especializações de Pessoa
+Ator -up-|> Pessoa
+Diretor -up-|> Pessoa
+
+' ==================== CLASSES PRINCIPAIS ====================
+
+class Ator {
+    - dataNascimento : LocalDate
+    + getDataNascimento() : LocalDate
+    + setDataNascimento(LocalDate data) : void
+}
+
+class Diretor {
+    - nacionalidade : String
+    - biografia : String
+    + getNacionalidade() : String
+    + setNacionalidade(String nacionalidade) : void
+    + getBiografia() : String
+    + setBiografia(String biografia) : void
+}
 
 class Filme {
     - nome : String
@@ -15,28 +53,51 @@ class Filme {
     - anoLancamento : Integer
     - imagemPoster : String
     - trailerUrl : String
-}
-
-class Ator {
-    - nome : String
+    + getNome() : String
+    + setNome(String nome) : void
+    + getDuracao() : String
+    + setDuracao(String duracao) : void
+    + getSinopse() : String
+    + setSinopse(String sinopse) : void
 }
 
 class Genero {
     - nome : String
+    + getNome() : String
+    + setNome(String nome) : void
 }
 
 class Premio {
     - nome : String
     - categoria : String
     - ano : Integer
+    + getNome() : String
+    + setNome(String nome) : void
+    + getCategoria() : String
+    + setCategoria(String categoria) : void
+    + getAno() : Integer
+    + setAno(Integer ano) : void
 }
 
 class Sala {
+    - numero : Integer
     - capacidade : Integer
+    + getNumero() : Integer
+    + setNumero(Integer numero) : void
+    + getCapacidade() : Integer
+    + setCapacidade(Integer capacidade) : void
 }
 
 class Poltrona {
     - codigo : String
+    - linha : String
+    - coluna : Integer
+    + getCodigo() : String
+    + setCodigo(String codigo) : void
+    + getLinha() : String
+    + setLinha(String linha) : void
+    + getColuna() : Integer
+    + setColuna(Integer coluna) : void
 }
 
 class Sessao {
@@ -45,11 +106,39 @@ class Sessao {
     - preco : Double
     - capacidadeTotal : Integer
     - capacidadeDisponivel : Integer
+    + getInicio() : LocalDateTime
+    + setInicio(LocalDateTime inicio) : void
+    + getFim() : LocalDateTime
+    + setFim(LocalDateTime fim) : void
+    + getPreco() : Double
+    + setPreco(Double preco) : void
 }
 
-' --------------------
-' Enums
-' --------------------
+class Cinema {
+    - nome : String
+    - cnpj : String
+    - telefone : String
+    + getNome() : String
+    + setNome(String nome) : void
+    + getCnpj() : String
+    + setCnpj(String cnpj) : void
+}
+
+class Endereco {
+    - logradouro : String
+    - numero : String
+    - complemento : String
+    - bairro : String
+    - cidade : String
+    - estado : String
+    - cep : String
+    + getLogradouro() : String
+    + setLogradouro(String logradouro) : void
+    + getCidade() : String
+    + setCidade(String cidade) : void
+}
+
+' ==================== ENUMS ====================
 
 enum Disponibilidade {
     DISPONIVEL
@@ -77,9 +166,19 @@ enum StatusSessao {
     CANCELADA
 }
 
-' --------------------
-' Relacionamentos
-' --------------------
+' ==================== RELACIONAMENTOS UNIDIRECIONAIS ====================
+
+' -------------------- ASSOCIAÇÃO UNIDIRECIONAL --------------------
+Diretor "1" --> "0..*" Filme : dirige
+
+' -------------------- AGREGAÇÃO UNIDIRECIONAL --------------------
+Cinema "1" o--> "1..*" Sala : possui
+Sala "1" o--> "1..*" Poltrona : contem
+
+' -------------------- COMPOSIÇÃO UNIDIRECIONAL --------------------
+Cinema "1" *--> "1" Endereco : localizadoEm
+
+' -------------------- ASSOCIAÇÕES UNIDIRECIONAIS --------------------
 Filme "*" --> "*" Ator : atores
 Filme "*" --> "*" Genero : generos
 Filme "1" --> "0..*" Premio : premios
@@ -89,11 +188,9 @@ Ator "1" --> "0..*" Premio : premios
 
 Sessao "*" --> "1" TipoSessao : tipo
 Sessao "*" --> "1" StatusSessao : status
-Sessao "*" --> "1" Filme : filme
-Sessao "*" --> "*" Sala : salas
+Sessao "*" --> "1" Filme : exibe
+Sessao "*" --> "*" Sala : utiliza
 
-Sala "1" *--> "*" Poltrona : poltronas
-
-Poltrona "*" --> "1" Disponibilidade : disponibilidade
+Poltrona "*" --> "1" Disponibilidade : possui
 
 @enduml

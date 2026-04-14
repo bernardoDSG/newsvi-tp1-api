@@ -32,13 +32,17 @@ public record SessaoRequestDTO(
     @Positive(message = "ID do status deve ser positivo")
     Long statusId,
     
+    @NotNull(message = "Tipo de sessão é obrigatório")
+    @Positive(message = "ID do tipo de sessão deve ser positivo")
+    Long tipoSessaoId,
+    
     @NotNull(message = "Filme é obrigatório")
     @Positive(message = "ID do filme deve ser positivo")
     Long filmeId,
     
-    @NotNull(message = "Tipo de sessão é obrigatório")
-    @Positive(message = "ID do tipo de sessão deve ser positivo")
-    Long tipoSessaoId,
+    @NotNull(message = "Cinema é obrigatório")
+    @Positive(message = "ID do cinema deve ser positivo")
+    Long cinemaId,
     
     @NotNull(message = "Salas são obrigatórias")
     List<@Positive(message = "ID da sala deve ser positivo") Long> salasIds

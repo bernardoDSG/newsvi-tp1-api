@@ -12,7 +12,8 @@ public record SessaoResponseDTO(
     Integer capacidadeDisponivel,
     String status,
     String statusNome,
-    String filmeNome,
     String tipoSessao,
+    String filmeNome,
+    String cinemaNome,
     List<Long> salasIds
 ) {}

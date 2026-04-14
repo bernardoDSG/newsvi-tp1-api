@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
-
 import br.unitins.model.Poltrona;
 import br.unitins.repository.PoltronaRepository;
+import br.unitins.service.PoltronaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -33,9 +33,6 @@ public class PoltronaServiceImpl implements PoltronaService {
     @Override
     @Transactional
     public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Poltrona não encontrada com ID: " + id);
         }
@@ -47,10 +44,7 @@ public class PoltronaServiceImpl implements PoltronaService {
     }
 
     @Override
-    public Poltrona findById(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
+    public Poltrona findById(Long id) {
         Poltrona poltrona = repository.findById(id);
         if (poltrona == null) {
             throw new NotFoundException("Poltrona não encontrada com ID: " + id);
@@ -59,7 +53,7 @@ public class PoltronaServiceImpl implements PoltronaService {
     }
 
     @Override
-    public List<Poltrona> findByCodigo(@NotNull(message = "Código não pode ser nulo") String codigo) {
+    public List<Poltrona> findByCodigo(String codigo) {
         if (codigo == null || codigo.trim().isEmpty()) {
             throw new IllegalArgumentException("Código não pode ser vazio");
         }
@@ -67,20 +61,37 @@ public class PoltronaServiceImpl implements PoltronaService {
     }
 
     @Override
-    public List<Poltrona> findByDisponibilidade(@NotNull(message = "ID da disponibilidade não pode ser nulo") Long disponibilidadeId) {
+    public List<Poltrona> findByDisponibilidade(Long disponibilidadeId) {
         if (disponibilidadeId == null) {
             throw new IllegalArgumentException("ID da disponibilidade não pode ser nulo");
         }
         return repository.findByDisponibilidade(disponibilidadeId).list();
     }
+    
+    @Override
+    public List<Poltrona> findBySala(Long salaId) {
+        if (salaId == null) {
+            throw new IllegalArgumentException("Sala ID não pode ser nulo");
+        }
+        return repository.findBySala(salaId).list();
+    }
 
     @Override
     @Transactional
-    public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Poltrona poltrona) {
+    public void update(Long id, @Valid Poltrona poltrona) {
         Poltrona p = findById(id);
         
         if (poltrona.getCodigo() != null && !poltrona.getCodigo().trim().isEmpty()) {
             p.setCodigo(poltrona.getCodigo());
+        }
+        if (poltrona.getLinha() != null) {
+            p.setLinha(poltrona.getLinha());
+        }
+        if (poltrona.getColuna() != null) {
+            p.setColuna(poltrona.getColuna());
+        }
+        if (poltrona.getSala() != null) {
+            p.setSala(poltrona.getSala());
         }
         if (poltrona.getDisponibilidade() != null) {
             p.setDisponibilidade(poltrona.getDisponibilidade());

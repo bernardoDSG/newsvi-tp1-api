@@ -20,8 +20,11 @@ public class FilmeRepository implements PanacheRepository<Filme> {
         return find("SELECT f FROM Filme f JOIN f.atores a WHERE UPPER(a.nome) LIKE UPPER(?1)", "%" + ator + "%");
     }
     
-    // NOVO: Buscar filmes por faixa de duração em minutos
     public PanacheQuery<Filme> findByDuracaoBetween(Integer minMinutos, Integer maxMinutos) {
         return find("duracaoMinutos BETWEEN ?1 AND ?2", minMinutos, maxMinutos);
+    }
+    
+    public PanacheQuery<Filme> findByDiretor(Long diretorId) {
+        return find("diretor.id", diretorId);
     }
 }

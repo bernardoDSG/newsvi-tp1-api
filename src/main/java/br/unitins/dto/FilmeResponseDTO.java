@@ -13,6 +13,7 @@ public record FilmeResponseDTO(
     String imagemPoster,
     String trailerUrl,
     String classificacaoIndicativa,
+    String diretorNome,
     List<String> generos,
     List<String> atores,
     List<PremioResponseDTO> premios

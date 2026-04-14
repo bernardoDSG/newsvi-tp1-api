@@ -1,9 +1,10 @@
 package br.unitins.service;
 
 import java.util.List;
-
 import br.unitins.model.Ator;
 import br.unitins.repository.AtorRepository;
+import br.unitins.repository.PremioRepository;
+import br.unitins.service.AtorService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,6 +17,9 @@ public class AtorServiceImpl implements AtorService {
 
     @Inject
     AtorRepository repository;
+    
+    @Inject
+    PremioRepository premioRepository;
 
     @Override
     @Transactional
@@ -30,9 +34,6 @@ public class AtorServiceImpl implements AtorService {
     @Override
     @Transactional
     public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Ator não encontrado com ID: " + id);
         }
@@ -44,10 +45,7 @@ public class AtorServiceImpl implements AtorService {
     }
 
     @Override
-    public Ator findById(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
+    public Ator findById(Long id) {
         Ator ator = repository.findById(id);
         if (ator == null) {
             throw new NotFoundException("Ator não encontrado com ID: " + id);
@@ -56,20 +54,37 @@ public class AtorServiceImpl implements AtorService {
     }
 
     @Override
-    public List<Ator> findByNome(@NotNull(message = "Nome não pode ser nulo") String nome) {
+    public List<Ator> findByNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome não pode ser vazio");
         }
         return repository.findByNome(nome).list();
     }
+    
+    @Override
+    public List<Ator> findByPremio(String premio) {
+        if (premio == null || premio.trim().isEmpty()) {
+            throw new IllegalArgumentException("Prêmio não pode ser vazio");
+        }
+        return repository.findByPremio(premio).list();
+    }
 
     @Override
     @Transactional
-    public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Ator ator) {
+    public void update(Long id, @Valid Ator ator) {
         Ator a = findById(id);
         
         if (ator.getNome() != null && !ator.getNome().trim().isEmpty()) {
             a.setNome(ator.getNome());
+        }
+        if (ator.getEmail() != null) {
+            a.setEmail(ator.getEmail());
+        }
+        if (ator.getTelefone() != null) {
+            a.setTelefone(ator.getTelefone());
+        }
+        if (ator.getDataNascimento() != null) {
+            a.setDataNascimento(ator.getDataNascimento());
         }
         if (ator.getPremios() != null) {
             a.setPremios(ator.getPremios());

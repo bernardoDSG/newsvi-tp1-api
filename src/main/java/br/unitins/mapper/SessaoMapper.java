@@ -4,13 +4,12 @@ import br.unitins.dto.SessaoRequestDTO;
 import br.unitins.dto.SessaoResponseDTO;
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
+import br.unitins.model.TipoSessao;
 
 public class SessaoMapper {
    
     public static Sessao toEntity(SessaoRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
+        if (dto == null) return null;
         Sessao sessao = new Sessao();
         sessao.setInicio(dto.inicio());
         sessao.setFim(dto.fim());
@@ -21,14 +20,14 @@ public class SessaoMapper {
         if (dto.statusId() != null) {
             sessao.setStatus(StatusSessao.valueOf(dto.statusId()));
         }
-        
+        if (dto.tipoSessaoId() != null) {
+            sessao.setTipo(TipoSessao.valueOf(dto.tipoSessaoId()));
+        }
         return sessao;
     }
 
     public static SessaoResponseDTO toResponseDTO(Sessao sessao) {
-        if (sessao == null) {
-            return null;
-        }
+        if (sessao == null) return null;
         return new SessaoResponseDTO(
             sessao.getId(),
             sessao.getInicio(),
@@ -38,8 +37,9 @@ public class SessaoMapper {
             sessao.getCapacidadeDisponivel(),
             sessao.getStatus() != null ? sessao.getStatus().name() : null,
             sessao.getStatus() != null ? sessao.getStatus().getNome() : null,
+            sessao.getTipo() != null ? sessao.getTipo().getNome() : null,
             sessao.getFilme() != null ? sessao.getFilme().getNome() : null,
-            sessao.getTipo() != null ? sessao.getTipo().getNOME() : null,
+            sessao.getCinema() != null ? sessao.getCinema().getNome() : null,
             sessao.getSalas() != null ? sessao.getSalas().stream().map(s -> s.getId()).toList() : null
         );
     }

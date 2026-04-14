@@ -7,9 +7,7 @@ import br.unitins.model.Premio;
 public class PremioMapper {
    
     public static Premio toEntity(PremioRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
+        if (dto == null) return null;
         Premio premio = new Premio();
         premio.setNome(dto.nome());
         premio.setAno(dto.ano());
@@ -18,9 +16,7 @@ public class PremioMapper {
     }
 
     public static PremioResponseDTO toResponseDTO(Premio premio) {
-        if (premio == null) {
-            return null;
-        }
+        if (premio == null) return null;
         return new PremioResponseDTO(
             premio.getId(), 
             premio.getNome(), 

@@ -1,13 +1,9 @@
 package br.unitins.dto;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
-public record AtorRequestDTO(
+public record DiretorRequestDTO(
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
     String nome,
@@ -18,8 +14,8 @@ public record AtorRequestDTO(
     @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     String telefone,
     
-    @Past(message = "Data de nascimento deve ser no passado")
-    LocalDate dataNascimento,
+    @Size(max = 50, message = "Nacionalidade deve ter no máximo 50 caracteres")
+    String nacionalidade,
     
-    List<Long> premiosIds
+    String biografia
 ) {}

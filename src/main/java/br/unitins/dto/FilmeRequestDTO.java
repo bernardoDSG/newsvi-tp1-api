@@ -14,7 +14,7 @@ public record FilmeRequestDTO(
     
     @NotBlank(message = "Duração é obrigatória")
     @Size(min = 1, max = 20, message = "Duração deve ter entre 1 e 20 caracteres")
-    String duracao,  // ← SÓ ISSO, sem duracaoMinutos
+    String duracao,
     
     @NotBlank(message = "Sinopse é obrigatória")
     @Size(min = 10, max = 2000, message = "Sinopse deve ter entre 10 e 2000 caracteres")
@@ -36,6 +36,8 @@ public record FilmeRequestDTO(
     @NotNull(message = "Classificação indicativa é obrigatória")
     @Positive(message = "ID da classificação deve ser positivo")
     Long classificacaoIndicativaId,
+    
+    Long diretorId,
     
     List<Long> generosIds,
     

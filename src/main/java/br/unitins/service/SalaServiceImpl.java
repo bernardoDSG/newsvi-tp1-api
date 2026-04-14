@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
-
 import br.unitins.model.Sala;
 import br.unitins.repository.SalaRepository;
+import br.unitins.service.SalaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,8 +20,11 @@ public class SalaServiceImpl implements SalaService {
     @Override
     @Transactional
     public Sala create(@Valid Sala sala) {
-        if (sala.getPoltronas() == null) {
-            throw new IllegalArgumentException("Poltronas são obrigatórias");
+        if (sala.getNumero() == null) {
+            throw new IllegalArgumentException("Número da sala é obrigatório");
+        }
+        if (sala.getCapacidade() == null || sala.getCapacidade() <= 0) {
+            throw new IllegalArgumentException("Capacidade deve ser maior que zero");
         }
         repository.persist(sala);
         return sala;
@@ -30,9 +33,6 @@ public class SalaServiceImpl implements SalaService {
     @Override
     @Transactional
     public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Sala não encontrada com ID: " + id);
         }
@@ -44,22 +44,48 @@ public class SalaServiceImpl implements SalaService {
     }
 
     @Override
-    public Sala findById(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
+    public Sala findById(Long id) {
         Sala sala = repository.findById(id);
         if (sala == null) {
             throw new NotFoundException("Sala não encontrada com ID: " + id);
         }
         return sala;
     }
+    
+    @Override
+    public Sala findByNumero(Integer numero) {
+        if (numero == null) {
+            throw new IllegalArgumentException("Número não pode ser nulo");
+        }
+        Sala sala = repository.findByNumero(numero);
+        if (sala == null) {
+            throw new NotFoundException("Sala não encontrada com número: " + numero);
+        }
+        return sala;
+    }
+    
+    @Override
+    public List<Sala> findByCinema(Long cinemaId) {
+        if (cinemaId == null) {
+            throw new IllegalArgumentException("Cinema ID não pode ser nulo");
+        }
+        return repository.list("cinema.id", cinemaId);
+    }
 
     @Override
     @Transactional
-    public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Sala sala) {
+    public void update(Long id, @Valid Sala sala) {
         Sala s = findById(id);
         
+        if (sala.getNumero() != null) {
+            s.setNumero(sala.getNumero());
+        }
+        if (sala.getCapacidade() != null && sala.getCapacidade() > 0) {
+            s.setCapacidade(sala.getCapacidade());
+        }
+        if (sala.getCinema() != null) {
+            s.setCinema(sala.getCinema());
+        }
         if (sala.getPoltronas() != null) {
             s.setPoltronas(sala.getPoltronas());
         }

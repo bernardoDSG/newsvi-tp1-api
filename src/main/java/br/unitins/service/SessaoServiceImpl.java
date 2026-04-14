@@ -2,10 +2,10 @@ package br.unitins.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
 import br.unitins.repository.SessaoRepository;
+import br.unitins.service.SessaoService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -44,12 +44,10 @@ public class SessaoServiceImpl implements SessaoService {
             throw new IllegalArgumentException("Capacidade total deve ser maior que zero");
         }
         
-        // CORRIGIDO: Status agora é enum, não String
         if (sessao.getStatus() == null) {
-            sessao.setStatus(StatusSessao.EM_BREVE); // valor padrão
+            sessao.setStatus(StatusSessao.EM_BREVE);
         }
 
-        // Se capacidade disponível não foi informada, usa a capacidade total
         if (sessao.getCapacidadeDisponivel() == null) {
             sessao.setCapacidadeDisponivel(sessao.getCapacidadeTotal());
         }
@@ -61,9 +59,6 @@ public class SessaoServiceImpl implements SessaoService {
     @Override
     @Transactional
     public void delete(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Sessão não encontrada com ID: " + id);
         }
@@ -75,31 +70,58 @@ public class SessaoServiceImpl implements SessaoService {
     }
 
     @Override
-    public Sessao findById(@NotNull(message = "ID não pode ser nulo") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID não pode ser nulo");
-        }
+    public Sessao findById(Long id) {
         Sessao sessao = repository.findById(id);
         if (sessao == null) {
             throw new NotFoundException("Sessão não encontrada com ID: " + id);
         }
         return sessao;
     }
+    
+    @Override
+    public List<Sessao> findByFilme(Long filmeId) {
+        if (filmeId == null) {
+            throw new IllegalArgumentException("Filme ID não pode ser nulo");
+        }
+        return repository.findByFilme(filmeId).list();
+    }
+    
+    @Override
+    public List<Sessao> findByCinema(Long cinemaId) {
+        if (cinemaId == null) {
+            throw new IllegalArgumentException("Cinema ID não pode ser nulo");
+        }
+        return repository.findByCinema(cinemaId).list();
+    }
+    
+    @Override
+    public List<Sessao> findByStatus(Long statusId) {
+        if (statusId == null) {
+            throw new IllegalArgumentException("Status ID não pode ser nulo");
+        }
+        return repository.findByStatus(statusId).list();
+    }
+    
+    @Override
+    public List<Sessao> findSessoesEmExibicao(LocalDateTime agora) {
+        if (agora == null) {
+            agora = LocalDateTime.now();
+        }
+        return repository.findSessoesEmExibicao(agora).list();
+    }
 
     @Override
-    public boolean existsBySalaAndHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim) {
-        long count = repository.find("SELECT COUNT(s) FROM Sessao s JOIN s.salas sala " +
-                "WHERE sala.id = ?1 AND " +
-                "((s.inicio BETWEEN ?2 AND ?3) OR " +
-                "(s.fim BETWEEN ?2 AND ?3) OR " +
-                "(?2 BETWEEN s.inicio AND s.fim))",
-                salaId, inicio, fim).count();
+    public boolean existsBySalaAndHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim, Long sessaoId) {
+        if (salaId == null || inicio == null || fim == null) {
+            throw new IllegalArgumentException("SalaId, início e fim são obrigatórios");
+        }
+        long count = repository.countConflitoHorario(salaId, inicio, fim, sessaoId);
         return count > 0;
     }
 
     @Override
     @Transactional
-    public void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Sessao sessao) {
+    public void update(Long id, @Valid Sessao sessao) {
         Sessao s = findById(id);
 
         if (sessao.getInicio() != null) {
@@ -126,9 +148,11 @@ public class SessaoServiceImpl implements SessaoService {
         if (sessao.getCapacidadeDisponivel() != null) {
             s.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel());
         }
-        // CORRIGIDO: Status agora é enum
         if (sessao.getStatus() != null) {
             s.setStatus(sessao.getStatus());
+        }
+        if (sessao.getCinema() != null) {
+            s.setCinema(sessao.getCinema());
         }
 
         if (s.getInicio() != null && s.getFim() != null && s.getInicio().isAfter(s.getFim())) {

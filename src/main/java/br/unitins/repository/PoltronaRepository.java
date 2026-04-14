@@ -13,6 +13,10 @@ public class PoltronaRepository implements PanacheRepository<Poltrona> {
     }
 
     public PanacheQuery<Poltrona> findByDisponibilidade(Long disponibilidadeId) {
-        return find("disponibilidade.ID = ?1", disponibilidadeId);
+        return find("disponibilidade.id", disponibilidadeId);
+    }
+    
+    public PanacheQuery<Poltrona> findBySala(Long salaId) {
+        return find("sala.id", salaId);
     }
 }
