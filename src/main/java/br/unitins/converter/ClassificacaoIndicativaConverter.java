@@ -12,7 +12,7 @@ public class ClassificacaoIndicativaConverter implements AttributeConverter<Clas
         if (classificacao == null) {
             return null;
         }
-        return classificacao.getID();
+        return classificacao.getId();
     }
 
     @Override

@@ -7,31 +7,20 @@ public enum Disponibilidade {
     DISPONIVEL(1L, "Disponível"),
     INDISPONIVEL(2L, "Indisponível");
 
-    private final Long ID;
-    private final String NOME;
+    private final Long id;
+    private final String nome;
 
     Disponibilidade(Long id, String nome) {
-        this.ID = id;
-        this.NOME = nome;
+        this.id = id;
+        this.nome = nome;
     }
 
-    public Long getID() {
-        return ID;
-    }
-
-    public String getNOME() {
-        return NOME;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
 
     public static Disponibilidade valueOf(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        for (Disponibilidade disponibilidade : Disponibilidade.values()) {
-            if (disponibilidade.getID().equals(id)) {
-                return disponibilidade;
-            }
+        for (Disponibilidade d : values()) {
+            if (d.getId().equals(id)) return d;
         }
         return null;
     }

@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
+
 import br.unitins.model.Filme;
 import br.unitins.repository.FilmeRepository;
-import br.unitins.service.FilmeService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

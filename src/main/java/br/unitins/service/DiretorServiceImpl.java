@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
+
 import br.unitins.model.Diretor;
 import br.unitins.repository.DiretorRepository;
-import br.unitins.service.DiretorService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

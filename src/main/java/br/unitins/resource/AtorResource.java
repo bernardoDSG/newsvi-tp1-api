@@ -29,7 +29,7 @@ public class AtorResource {
     
     @Inject
     AtorService service;
-
+    
     @Inject
     PremioRepository premioRepository;
 
@@ -45,11 +45,6 @@ public class AtorResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Ator ator = service.findById(id);
-        if (ator == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Ator não encontrado com ID: " + id)
-                .build();
-        }
         return Response.ok(AtorMapper.toResponseDTO(ator)).build();
     }
 
@@ -62,6 +57,20 @@ public class AtorResource {
         if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
                 .entity("Nenhum ator encontrado com nome: " + nome)
+                .build();
+        }
+        return Response.ok(list).build();
+    }
+    
+    @GET
+    @Path("/premio/{premio}")
+    public Response buscarPorPremio(@PathParam("premio") String premio) {
+        List<AtorResponseDTO> list = service.findByPremio(premio).stream()
+            .map(AtorMapper::toResponseDTO)
+            .toList();
+        if (list.isEmpty()) {
+            return Response.status(Status.NOT_FOUND)
+                .entity("Nenhum ator encontrado com prêmio: " + premio)
                 .build();
         }
         return Response.ok(list).build();

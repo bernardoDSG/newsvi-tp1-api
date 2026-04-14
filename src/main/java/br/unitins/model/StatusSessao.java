@@ -17,22 +17,12 @@ public enum StatusSessao {
         this.nome = nome;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
 
     public static StatusSessao valueOf(Long id) {
-        if (id == null) {
-            return null;
-        }
-        for (StatusSessao status : StatusSessao.values()) {
-            if (status.getId().equals(id)) {
-                return status;
-            }
+        for (StatusSessao s : values()) {
+            if (s.getId().equals(id)) return s;
         }
         return null;
     }

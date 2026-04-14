@@ -10,7 +10,7 @@ public class DisponibilidadeConverter implements AttributeConverter<Disponibilid
         if (disponibilidade == null) {
             return null;
         }
-        return disponibilidade.getID();
+        return disponibilidade.getId();
     }
 
     @Override

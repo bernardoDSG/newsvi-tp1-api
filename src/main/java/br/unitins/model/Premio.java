@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 @Entity
 public class Premio extends DefaultEntity {
     private String nome;
-    private Integer ano;
     private String categoria;
+    private Integer ano;
 
     public String getNome() {
         return nome;
@@ -16,19 +16,19 @@ public class Premio extends DefaultEntity {
         this.nome = nome;
     }
 
-    public Integer getAno() {
-        return ano;
-    }
-
-    public void setAno(Integer ano) {
-        this.ano = ano;
-    }
-
     public String getCategoria() {
         return categoria;
     }
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public Integer getAno() {
+        return ano;
+    }
+
+    public void setAno(Integer ano) {
+        this.ano = ano;
     }
 }

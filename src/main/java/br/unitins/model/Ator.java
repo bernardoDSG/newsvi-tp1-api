@@ -1,5 +1,6 @@
 package br.unitins.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +9,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 
-
 @Entity
-public class Ator extends DefaultEntity{
-    private String nome;
+public class Ator extends Pessoa {
+    private LocalDate dataNascimento;
+
     @OneToMany
     @JoinTable(
         name = "ator_premio",
@@ -20,13 +21,12 @@ public class Ator extends DefaultEntity{
     )
     private List<Premio> premios = new ArrayList<>();
 
-
-    public String getNome() {
-        return nome;
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
     }
 
     public List<Premio> getPremios() {
@@ -36,5 +36,4 @@ public class Ator extends DefaultEntity{
     public void setPremios(List<Premio> premios) {
         this.premios = premios;
     }
-
 }

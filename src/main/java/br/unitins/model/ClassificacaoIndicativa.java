@@ -11,31 +11,20 @@ public enum ClassificacaoIndicativa {
     DEZESSEIS(5L, "16 anos"),
     DEZOITO(6L, "18 anos");
 
-    private final Long ID;
-    private final String NOME;
+    private final Long id;
+    private final String nome;
 
     ClassificacaoIndicativa(Long id, String nome) {
-        this.ID = id;
-        this.NOME = nome;
+        this.id = id;
+        this.nome = nome;
     }
 
-    public Long getID() {
-        return ID;
-    }
-
-    public String getNOME() {
-        return NOME;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
 
     public static ClassificacaoIndicativa valueOf(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        for (ClassificacaoIndicativa classificacao : ClassificacaoIndicativa.values()) {
-            if (classificacao.getID().equals(id)) {
-                return classificacao;
-            }
+        for (ClassificacaoIndicativa c : values()) {
+            if (c.getId().equals(id)) return c;
         }
         return null;
     }

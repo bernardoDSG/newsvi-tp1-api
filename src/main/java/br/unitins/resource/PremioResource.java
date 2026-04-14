@@ -41,11 +41,6 @@ public class PremioResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Premio premio = service.findById(id);
-        if (premio == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Prêmio não encontrado com ID: " + id)
-                .build();
-        }
         return Response.ok(PremioMapper.toResponseDTO(premio)).build();
     }
 
@@ -58,6 +53,20 @@ public class PremioResource {
         if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
                 .entity("Nenhum prêmio encontrado com nome: " + nome)
+                .build();
+        }
+        return Response.ok(list).build();
+    }
+    
+    @GET
+    @Path("/categoria/{categoria}")
+    public Response buscarPorCategoria(@PathParam("categoria") String categoria) {
+        List<PremioResponseDTO> list = service.findByCategoria(categoria).stream()
+            .map(PremioMapper::toResponseDTO)
+            .toList();
+        if (list.isEmpty()) {
+            return Response.status(Status.NOT_FOUND)
+                .entity("Nenhum prêmio encontrado com categoria: " + categoria)
                 .build();
         }
         return Response.ok(list).build();
@@ -77,10 +86,6 @@ public class PremioResource {
             service.create(premio);
             return Response.status(Status.CREATED)
                 .entity(PremioMapper.toResponseDTO(premio))
-                .build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                .entity(e.getMessage())
                 .build();
         } catch (Exception e) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -111,10 +116,6 @@ public class PremioResource {
             premio.setId(id);
             service.update(id, premio);
             return Response.ok(PremioMapper.toResponseDTO(premio)).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                .entity(e.getMessage())
-                .build();
         } catch (Exception e) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
                 .entity("Erro ao atualizar prêmio: " + e.getMessage())

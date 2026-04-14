@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
+
 import br.unitins.model.Endereco;
 import br.unitins.repository.EnderecoRepository;
-import br.unitins.service.EnderecoService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

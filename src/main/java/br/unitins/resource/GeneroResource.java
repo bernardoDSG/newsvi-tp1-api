@@ -41,11 +41,6 @@ public class GeneroResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Genero genero = service.findById(id);
-        if (genero == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Gênero não encontrado com ID: " + id)
-                .build();
-        }
         return Response.ok(GeneroMapper.toResponseDTO(genero)).build();
     }
 

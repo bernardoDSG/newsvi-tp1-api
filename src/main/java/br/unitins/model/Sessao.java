@@ -1,11 +1,9 @@
 package br.unitins.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import br.unitins.converter.StatusSessaoConverter;
-import br.unitins.converter.TipoSessaoConverter;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -19,92 +17,57 @@ public class Sessao extends DefaultEntity {
     private Double preco;
     private Integer capacidadeTotal;
     private Integer capacidadeDisponivel;
-    
-    @Convert(converter = StatusSessaoConverter.class)
-    private StatusSessao status;  // Agora é enum!
-    
+
     @ManyToOne
-    private Filme filme;
-    
-    @Convert(converter = TipoSessaoConverter.class)
+    @JoinColumn(name = "tipo_sessao_id")
     private TipoSessao tipo;
-    
+
+    @ManyToOne
+    @JoinColumn(name = "status_sessao_id")
+    private StatusSessao status;
+
+    @ManyToOne
+    @JoinColumn(name = "filme_id")
+    private Filme filme;
+
+    @ManyToOne
+    @JoinColumn(name = "cinema_id")
+    private Cinema cinema;
+
     @ManyToMany
     @JoinTable(name = "sessao_sala", 
                joinColumns = @JoinColumn(name = "sessao_id"), 
                inverseJoinColumns = @JoinColumn(name = "sala_id"))
-    private List<Sala> salas;
+    private List<Sala> salas = new ArrayList<>();
 
     // Getters e Setters
-    public LocalDateTime getInicio() {
-        return inicio;
-    }
+    public LocalDateTime getInicio() { return inicio; }
+    public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
 
-    public void setInicio(LocalDateTime inicio) {
-        this.inicio = inicio;
-    }
+    public LocalDateTime getFim() { return fim; }
+    public void setFim(LocalDateTime fim) { this.fim = fim; }
 
-    public LocalDateTime getFim() {
-        return fim;
-    }
+    public Double getPreco() { return preco; }
+    public void setPreco(Double preco) { this.preco = preco; }
 
-    public void setFim(LocalDateTime fim) {
-        this.fim = fim;
-    }
+    public Integer getCapacidadeTotal() { return capacidadeTotal; }
+    public void setCapacidadeTotal(Integer capacidadeTotal) { this.capacidadeTotal = capacidadeTotal; }
 
-    public Double getPreco() {
-        return preco;
-    }
+    public Integer getCapacidadeDisponivel() { return capacidadeDisponivel; }
+    public void setCapacidadeDisponivel(Integer capacidadeDisponivel) { this.capacidadeDisponivel = capacidadeDisponivel; }
 
-    public void setPreco(Double preco) {
-        this.preco = preco;
-    }
+    public TipoSessao getTipo() { return tipo; }
+    public void setTipo(TipoSessao tipo) { this.tipo = tipo; }
 
-    public Integer getCapacidadeTotal() {
-        return capacidadeTotal;
-    }
+    public StatusSessao getStatus() { return status; }
+    public void setStatus(StatusSessao status) { this.status = status; }
 
-    public void setCapacidadeTotal(Integer capacidadeTotal) {
-        this.capacidadeTotal = capacidadeTotal;
-    }
+    public Filme getFilme() { return filme; }
+    public void setFilme(Filme filme) { this.filme = filme; }
 
-    public Integer getCapacidadeDisponivel() {
-        return capacidadeDisponivel;
-    }
+    public Cinema getCinema() { return cinema; }
+    public void setCinema(Cinema cinema) { this.cinema = cinema; }
 
-    public void setCapacidadeDisponivel(Integer capacidadeDisponivel) {
-        this.capacidadeDisponivel = capacidadeDisponivel;
-    }
-
-    public StatusSessao getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusSessao status) {
-        this.status = status;
-    }
-
-    public Filme getFilme() {
-        return filme;
-    }
-
-    public void setFilme(Filme filme) {
-        this.filme = filme;
-    }
-
-    public TipoSessao getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoSessao tipo) {
-        this.tipo = tipo;
-    }
-
-    public List<Sala> getSalas() {
-        return salas;
-    }
-
-    public void setSalas(List<Sala> salas) {
-        this.salas = salas;
-    }
+    public List<Sala> getSalas() { return salas; }
+    public void setSalas(List<Sala> salas) { this.salas = salas; }
 }

@@ -5,10 +5,10 @@ import java.util.List;
 import br.unitins.dto.FilmeRequestDTO;
 import br.unitins.dto.FilmeResponseDTO;
 import br.unitins.mapper.FilmeMapper;
-import br.unitins.mapper.PremioMapper;
 import br.unitins.model.ClassificacaoIndicativa;
 import br.unitins.model.Filme;
 import br.unitins.repository.AtorRepository;
+import br.unitins.repository.DiretorRepository;
 import br.unitins.repository.GeneroRepository;
 import br.unitins.repository.PremioRepository;
 import br.unitins.service.FilmeService;
@@ -44,165 +44,81 @@ public class FilmeResource {
 
     @Inject
     PremioRepository premioRepository;
+    
+    @Inject
+    DiretorRepository diretorRepository;
 
-    // ==================== GET (buscar todos) ====================
-    @SuppressWarnings("null")
     @GET
     public Response buscarTodos() {
         List<FilmeResponseDTO> list = service.findAll().stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getDuracaoMinutos(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getImagemPoster(),
-                        filme.getTrailerUrl(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
         return Response.ok(list).build();
     }
 
-    // ==================== GET (buscar por ID) ====================
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Filme filme = service.findById(id);
-        if (filme == null) {
-            return Response.status(Status.NOT_FOUND)
-                    .entity("Filme não encontrado com ID: " + id)
-                    .build();
-        }
-
-        FilmeResponseDTO response = new FilmeResponseDTO(
-                filme.getId(),
-                filme.getNome(),
-                filme.getDuracao(),
-                filme.getDuracaoMinutos(),
-                filme.getSinopse(),
-                filme.getIdiomaOriginal(),
-                filme.getAnoLancamento(),
-                filme.getImagemPoster(),
-                filme.getTrailerUrl(),
-                filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
-                filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                filme.getPremios() != null ? filme.getPremios().stream()
-                        .map(PremioMapper::toResponseDTO)
-                        .toList() : null);
-
-        return Response.ok(response).build();
+        return Response.ok(FilmeMapper.toResponseDTO(filme)).build();
     }
 
-    // ==================== GET (buscar por nome) ====================
-    @SuppressWarnings("null")
     @GET
     @Path("/find/{nome}")
     public Response buscarPeloNome(@PathParam("nome") String nome) {
         List<FilmeResponseDTO> list = service.findByNome(nome).stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getDuracaoMinutos(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getImagemPoster(),
-                        filme.getTrailerUrl(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
-
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
         if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
-                    .entity("Nenhum filme encontrado com nome: " + nome)
-                    .build();
+                .entity("Nenhum filme encontrado com nome: " + nome)
+                .build();
         }
         return Response.ok(list).build();
     }
 
-    // ==================== GET (buscar por gênero) ====================
-    @SuppressWarnings("null")
     @GET
     @Path("/genero/{genero}")
     public Response buscarPorGenero(@PathParam("genero") String genero) {
         List<FilmeResponseDTO> list = service.findByGenero(genero).stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getDuracaoMinutos(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getImagemPoster(),
-                        filme.getTrailerUrl(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
-
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
         if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
-                    .entity("Nenhum filme encontrado para o gênero: " + genero)
-                    .build();
+                .entity("Nenhum filme encontrado para o gênero: " + genero)
+                .build();
         }
         return Response.ok(list).build();
     }
 
-    // ==================== GET (buscar por ator) ====================
-    @SuppressWarnings("null")
     @GET
     @Path("/ator/{ator}")
     public Response buscarPorAtor(@PathParam("ator") String ator) {
         List<FilmeResponseDTO> list = service.findByAtor(ator).stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getDuracaoMinutos(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getImagemPoster(),
-                        filme.getTrailerUrl(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
-
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
         if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
-                    .entity("Nenhum filme encontrado para o ator: " + ator)
-                    .build();
+                .entity("Nenhum filme encontrado para o ator: " + ator)
+                .build();
+        }
+        return Response.ok(list).build();
+    }
+    
+    @GET
+    @Path("/diretor/{diretorId}")
+    public Response buscarPorDiretor(@PathParam("diretorId") Long diretorId) {
+        List<FilmeResponseDTO> list = service.findByDiretor(diretorId).stream()
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
+        if (list.isEmpty()) {
+            return Response.status(Status.NOT_FOUND)
+                .entity("Nenhum filme encontrado para o diretor com ID: " + diretorId)
+                .build();
         }
         return Response.ok(list).build();
     }
 
-    // ==================== GET (buscar por duração) ====================
-    @SuppressWarnings("null")
     @GET
     @Path("/duracao")
     public Response buscarPorDuracao(
@@ -222,29 +138,12 @@ public class FilmeResource {
         }
 
         List<FilmeResponseDTO> list = service.findByDuracaoBetween(minMinutos, maxMinutos).stream()
-                .map(filme -> new FilmeResponseDTO(
-                        filme.getId(),
-                        filme.getNome(),
-                        filme.getDuracao(),
-                        filme.getDuracaoMinutos(),
-                        filme.getSinopse(),
-                        filme.getIdiomaOriginal(),
-                        filme.getAnoLancamento(),
-                        filme.getImagemPoster(),
-                        filme.getTrailerUrl(),
-                        filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME()
-                                : null,
-                        filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                        filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                        filme.getPremios() != null ? filme.getPremios().stream()
-                                .map(PremioMapper::toResponseDTO)
-                                .toList() : null))
-                .toList();
+            .map(FilmeMapper::toResponseDTO)
+            .toList();
 
         return Response.ok(list).build();
     }
 
-    // ==================== POST (criar) ====================
     @POST
     public Response criar(@Valid FilmeRequestDTO dto) {
         try {
@@ -258,14 +157,23 @@ public class FilmeResource {
             Filme filme = FilmeMapper.toEntity(dto);
 
             if (dto.classificacaoIndicativaId() != null) {
-                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa
-                        .valueOf(dto.classificacaoIndicativaId());
+                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa.valueOf(dto.classificacaoIndicativaId());
                 if (classificacao == null) {
                     return Response.status(Status.BAD_REQUEST)
                             .entity("Classificação indicativa inválida")
                             .build();
                 }
                 filme.setClassificacaoIndicativa(classificacao);
+            }
+            
+            if (dto.diretorId() != null) {
+                var diretor = diretorRepository.findById(dto.diretorId());
+                if (diretor == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                            .entity("Diretor não encontrado com ID: " + dto.diretorId())
+                            .build();
+                }
+                filme.setDiretor(diretor);
             }
 
             if (dto.generosIds() != null && !dto.generosIds().isEmpty()) {
@@ -290,27 +198,9 @@ public class FilmeResource {
             }
 
             service.create(filme);
-
-            FilmeResponseDTO response = new FilmeResponseDTO(
-                    filme.getId(),
-                    filme.getNome(),
-                    filme.getDuracao(),
-                    filme.getDuracaoMinutos(),
-                    filme.getSinopse(),
-                    filme.getIdiomaOriginal(),
-                    filme.getAnoLancamento(),
-                    filme.getImagemPoster(),
-                    filme.getTrailerUrl(),
-                    filme.getClassificacaoIndicativa() != null ? filme.getClassificacaoIndicativa().getNOME() : null,
-                    filme.getGeneros() != null ? filme.getGeneros().stream().map(g -> g.getNome()).toList() : null,
-                    filme.getAtores() != null ? filme.getAtores().stream().map(a -> a.getNome()).toList() : null,
-                    filme.getPremios() != null ? filme.getPremios().stream()
-                            .map(PremioMapper::toResponseDTO)
-                            .toList() : null);
-
             return Response.status(Status.CREATED)
-                    .entity(response)
-                    .build();
+                .entity(FilmeMapper.toResponseDTO(filme))
+                .build();
         } catch (IllegalArgumentException e) {
             return Response.status(Status.BAD_REQUEST)
                     .entity(e.getMessage())
@@ -322,7 +212,6 @@ public class FilmeResource {
         }
     }
 
-    // ==================== PUT (atualizar) ====================
     @PUT
     @Path("/{id}")
     public Response alterar(@PathParam("id") Long id, @Valid FilmeRequestDTO dto) {
@@ -345,14 +234,23 @@ public class FilmeResource {
             filme.setId(id);
 
             if (dto.classificacaoIndicativaId() != null) {
-                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa
-                        .valueOf(dto.classificacaoIndicativaId());
+                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa.valueOf(dto.classificacaoIndicativaId());
                 if (classificacao == null) {
                     return Response.status(Status.BAD_REQUEST)
                             .entity("Classificação indicativa inválida")
                             .build();
                 }
                 filme.setClassificacaoIndicativa(classificacao);
+            }
+            
+            if (dto.diretorId() != null) {
+                var diretor = diretorRepository.findById(dto.diretorId());
+                if (diretor == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                            .entity("Diretor não encontrado com ID: " + dto.diretorId())
+                            .build();
+                }
+                filme.setDiretor(diretor);
             }
 
             if (dto.generosIds() != null) {
@@ -377,34 +275,8 @@ public class FilmeResource {
             }
 
             service.update(id, filme);
-
-            // Buscar o filme atualizado para retornar
             Filme filmeAtualizado = service.findById(id);
-
-            FilmeResponseDTO response = new FilmeResponseDTO(
-                    filmeAtualizado.getId(),
-                    filmeAtualizado.getNome(),
-                    filmeAtualizado.getDuracao(),
-                    filmeAtualizado.getDuracaoMinutos(),
-                    filmeAtualizado.getSinopse(),
-                    filmeAtualizado.getIdiomaOriginal(),
-                    filmeAtualizado.getAnoLancamento(),
-                    filmeAtualizado.getImagemPoster(),
-                    filmeAtualizado.getTrailerUrl(),
-                    filmeAtualizado.getClassificacaoIndicativa() != null
-                            ? filmeAtualizado.getClassificacaoIndicativa().getNOME()
-                            : null,
-                    filmeAtualizado.getGeneros() != null
-                            ? filmeAtualizado.getGeneros().stream().map(g -> g.getNome()).toList()
-                            : null,
-                    filmeAtualizado.getAtores() != null
-                            ? filmeAtualizado.getAtores().stream().map(a -> a.getNome()).toList()
-                            : null,
-                    filmeAtualizado.getPremios() != null ? filmeAtualizado.getPremios().stream()
-                            .map(PremioMapper::toResponseDTO)
-                            .toList() : null);
-
-            return Response.ok(response).build();
+            return Response.ok(FilmeMapper.toResponseDTO(filmeAtualizado)).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Status.BAD_REQUEST)
                     .entity(e.getMessage())
@@ -416,7 +288,6 @@ public class FilmeResource {
         }
     }
 
-    // ==================== DELETE ====================
     @DELETE
     @Path("/{id}")
     public Response deletarPorId(@PathParam("id") Long id) {

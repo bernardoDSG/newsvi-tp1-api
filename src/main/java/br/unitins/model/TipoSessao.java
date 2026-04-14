@@ -4,34 +4,23 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum TipoSessao {
-    DUBLADA(1L,"Dublada"),
-    LEGENDADA(2L,"Legendada");
-    
-    private final Long ID;
-    private final String NOME;
+    DUBLADA(1L, "Dublada"),
+    LEGENDADA(2L, "Legendada");
+
+    private final Long id;
+    private final String nome;
 
     TipoSessao(Long id, String nome) {
-        this.ID = id;
-        this.NOME = nome;
+        this.id = id;
+        this.nome = nome;
     }
 
-    public Long getID() {
-        return ID;
-    }
-
-    public String getNOME() {
-        return NOME;
-    }
+    public Long getId() { return id; }
+    public String getNome() { return nome; }
 
     public static TipoSessao valueOf(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        for (TipoSessao tipoSessao : TipoSessao.values()) {
-            if (tipoSessao.getID().equals(id)) {
-                return tipoSessao;
-            }
+        for (TipoSessao t : values()) {
+            if (t.getId().equals(id)) return t;
         }
         return null;
     }

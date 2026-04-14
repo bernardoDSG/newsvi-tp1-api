@@ -2,10 +2,10 @@ package br.unitins.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
 import br.unitins.repository.SessaoRepository;
-import br.unitins.service.SessaoService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

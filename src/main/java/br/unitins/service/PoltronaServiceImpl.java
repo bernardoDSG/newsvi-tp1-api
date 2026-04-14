@@ -1,9 +1,9 @@
 package br.unitins.service;
 
 import java.util.List;
+
 import br.unitins.model.Poltrona;
 import br.unitins.repository.PoltronaRepository;
-import br.unitins.service.PoltronaService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

@@ -10,7 +10,7 @@ public class TipoSessaoConverter implements AttributeConverter<TipoSessao, Long>
         if (tipo == null) {
             return null;
         }
-        return tipo.getID();
+        return tipo.getId();
     }
 
     @Override

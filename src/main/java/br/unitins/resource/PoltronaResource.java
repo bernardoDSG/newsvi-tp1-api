@@ -7,6 +7,7 @@ import br.unitins.dto.PoltronaResponseDTO;
 import br.unitins.mapper.PoltronaMapper;
 import br.unitins.model.Disponibilidade;
 import br.unitins.model.Poltrona;
+import br.unitins.repository.SalaRepository;
 import br.unitins.service.PoltronaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -29,6 +30,9 @@ public class PoltronaResource {
     
     @Inject
     PoltronaService service;
+    
+    @Inject
+    SalaRepository salaRepository;
 
     @GET
     public Response buscarTodos() {
@@ -42,11 +46,6 @@ public class PoltronaResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Poltrona poltrona = service.findById(id);
-        if (poltrona == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Poltrona não encontrada com ID: " + id)
-                .build();
-        }
         return Response.ok(PoltronaMapper.toResponseDTO(poltrona)).build();
     }
 
@@ -77,6 +76,20 @@ public class PoltronaResource {
         }
         return Response.ok(list).build();
     }
+    
+    @GET
+    @Path("/sala/{salaId}")
+    public Response buscarPorSala(@PathParam("salaId") Long salaId) {
+        List<PoltronaResponseDTO> list = service.findBySala(salaId).stream()
+            .map(PoltronaMapper::toResponseDTO)
+            .toList();
+        if (list.isEmpty()) {
+            return Response.status(Status.NOT_FOUND)
+                .entity("Nenhuma poltrona encontrada para sala ID: " + salaId)
+                .build();
+        }
+        return Response.ok(list).build();
+    }
 
     @POST
     public Response criar(@Valid PoltronaRequestDTO dto) {
@@ -91,6 +104,16 @@ public class PoltronaResource {
                         .build();
                 }
                 poltrona.setDisponibilidade(disponibilidade);
+            }
+            
+            if (dto.salaId() != null) {
+                var sala = salaRepository.findById(dto.salaId());
+                if (sala == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                        .entity("Sala não encontrada com ID: " + dto.salaId())
+                        .build();
+                }
+                poltrona.setSala(sala);
             }
             
             service.create(poltrona);
@@ -126,6 +149,16 @@ public class PoltronaResource {
                         .build();
                 }
                 poltrona.setDisponibilidade(disponibilidade);
+            }
+            
+            if (dto.salaId() != null) {
+                var sala = salaRepository.findById(dto.salaId());
+                if (sala == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                        .entity("Sala não encontrada com ID: " + dto.salaId())
+                        .build();
+                }
+                poltrona.setSala(sala);
             }
             
             service.update(id, poltrona);

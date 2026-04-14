@@ -7,6 +7,7 @@ import br.unitins.dto.SalaResponseDTO;
 import br.unitins.mapper.SalaMapper;
 import br.unitins.model.Poltrona;
 import br.unitins.model.Sala;
+import br.unitins.repository.CinemaRepository;
 import br.unitins.repository.PoltronaRepository;
 import br.unitins.service.SalaService;
 import jakarta.inject.Inject;
@@ -30,7 +31,10 @@ public class SalaResource {
     
     @Inject
     SalaService service;
-
+    
+    @Inject
+    CinemaRepository cinemaRepository;
+    
     @Inject
     PoltronaRepository poltronaRepository;
 
@@ -46,18 +50,44 @@ public class SalaResource {
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Sala sala = service.findById(id);
-        if (sala == null) {
+        return Response.ok(SalaMapper.toResponseDTO(sala)).build();
+    }
+    
+    @GET
+    @Path("/numero/{numero}")
+    public Response buscarPorNumero(@PathParam("numero") Integer numero) {
+        Sala sala = service.findByNumero(numero);
+        return Response.ok(SalaMapper.toResponseDTO(sala)).build();
+    }
+    
+    @GET
+    @Path("/cinema/{cinemaId}")
+    public Response buscarPorCinema(@PathParam("cinemaId") Long cinemaId) {
+        List<SalaResponseDTO> list = service.findByCinema(cinemaId).stream()
+            .map(SalaMapper::toResponseDTO)
+            .toList();
+        if (list.isEmpty()) {
             return Response.status(Status.NOT_FOUND)
-                .entity("Sala não encontrada com ID: " + id)
+                .entity("Nenhuma sala encontrada para o cinema ID: " + cinemaId)
                 .build();
         }
-        return Response.ok(SalaMapper.toResponseDTO(sala)).build();
+        return Response.ok(list).build();
     }
 
     @POST
     public Response criar(@Valid SalaRequestDTO dto) {
         try {
             Sala sala = SalaMapper.toEntity(dto);
+            
+            if (dto.cinemaId() != null) {
+                var cinema = cinemaRepository.findById(dto.cinemaId());
+                if (cinema == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
+                        .build();
+                }
+                sala.setCinema(cinema);
+            }
             
             if (dto.poltronasIds() != null && !dto.poltronasIds().isEmpty()) {
                 List<Poltrona> poltronas = dto.poltronasIds().stream()
@@ -91,6 +121,16 @@ public class SalaResource {
             
             Sala sala = SalaMapper.toEntity(dto);
             sala.setId(id);
+            
+            if (dto.cinemaId() != null) {
+                var cinema = cinemaRepository.findById(dto.cinemaId());
+                if (cinema == null) {
+                    return Response.status(Status.BAD_REQUEST)
+                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
+                        .build();
+                }
+                sala.setCinema(cinema);
+            }
             
             if (dto.poltronasIds() != null) {
                 List<Poltrona> poltronas = dto.poltronasIds().stream()

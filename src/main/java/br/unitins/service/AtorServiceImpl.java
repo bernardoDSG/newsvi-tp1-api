@@ -1,10 +1,10 @@
 package br.unitins.service;
 
 import java.util.List;
+
 import br.unitins.model.Ator;
 import br.unitins.repository.AtorRepository;
 import br.unitins.repository.PremioRepository;
-import br.unitins.service.AtorService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
