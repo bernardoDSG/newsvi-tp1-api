@@ -1,5 +1,5 @@
 @startuml diagramaClassesAdmin
-title Diagrama de Classes - CRUD's Administrativos 
+title Diagrama de Classes - CRUD's Administrativos
 caption Aluno: Bernardo dos Santos Graça
 
 ' ==================== CONFIGURAÇÕES ====================
@@ -13,14 +13,14 @@ skinparam class {
 ' ==================== HERANÇA ====================
 abstract class Pessoa {
     - nome : String
-    - email : String
-    - telefone : String
+    - dataNascimento : LocalDate
+    - nacionalidade : String
+    + getNacionalidade() : String
+    + setNacionalidade(String nacionalidade) : void
+    + getDataNascimento() : LocalDate
+    + setDataNascimento(LocalDate data) : void
     + getNome() : String
     + setNome(String nome) : void
-    + getEmail() : String
-    + setEmail(String email) : void
-    + getTelefone() : String
-    + setTelefone(String telefone) : void
 }
 
 ' Herança: Ator e Diretor são especializações de Pessoa
@@ -30,18 +30,9 @@ Diretor -up-|> Pessoa
 ' ==================== CLASSES PRINCIPAIS ====================
 
 class Ator {
-    - dataNascimento : LocalDate
-    + getDataNascimento() : LocalDate
-    + setDataNascimento(LocalDate data) : void
 }
 
 class Diretor {
-    - nacionalidade : String
-    - biografia : String
-    + getNacionalidade() : String
-    + setNacionalidade(String nacionalidade) : void
-    + getBiografia() : String
-    + setBiografia(String biografia) : void
 }
 
 class Filme {
@@ -49,7 +40,7 @@ class Filme {
     - duracao : String
     - duracaoMinutos : Integer
     - sinopse : String
-    - idiomaOriginal : String 
+    - idiomaOriginal : String
     - anoLancamento : Integer
     - imagemPoster : String
     - trailerUrl : String
@@ -169,7 +160,8 @@ enum StatusSessao {
 ' ==================== RELACIONAMENTOS UNIDIRECIONAIS ====================
 
 ' -------------------- ASSOCIAÇÃO UNIDIRECIONAL --------------------
-Diretor "1" --> "0..*" Filme : dirige
+' CORRIGIDO: Filme -> Diretor (Filme conhece seu diretor)
+Filme "*" --> "1" Diretor : possuiDiretor
 
 ' -------------------- AGREGAÇÃO UNIDIRECIONAL --------------------
 Cinema "1" o--> "1..*" Sala : possui

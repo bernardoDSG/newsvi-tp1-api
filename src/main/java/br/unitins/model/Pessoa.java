@@ -1,12 +1,14 @@
 package br.unitins.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class Pessoa extends DefaultEntity {
     private String nome;
-    private String email;
-    private String telefone;
+    private LocalDate dataNascimento;
+    private String nacionalidade;
 
     public String getNome() {
         return nome;
@@ -16,19 +18,19 @@ public abstract class Pessoa extends DefaultEntity {
         this.nome = nome;
     }
 
-    public String getEmail() {
-        return email;
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getNacionalidade() {
+        return nacionalidade;
     }
 
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public void setNacionalidade(String nacionalidade) {
+        this.nacionalidade = nacionalidade;
     }
 }
