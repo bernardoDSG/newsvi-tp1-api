@@ -14,7 +14,5 @@ public record SalaRequestDTO(
     @Positive(message = "Capacidade deve ser positiva")
     Integer capacidade,
     
-    Long cinemaId,
-    
     List<Long> poltronasIds
 ) {}

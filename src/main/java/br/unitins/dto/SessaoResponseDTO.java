@@ -7,7 +7,6 @@ public record SessaoResponseDTO(
     Long id,
     LocalDateTime inicio,
     LocalDateTime fim,
-    Double preco,
     Integer capacidadeTotal,
     Integer capacidadeDisponivel,
     String status,

@@ -13,7 +13,6 @@ public class SessaoMapper {
         Sessao sessao = new Sessao();
         sessao.setInicio(dto.inicio());
         sessao.setFim(dto.fim());
-        sessao.setPreco(dto.preco());
         sessao.setCapacidadeTotal(dto.capacidadeTotal());
         sessao.setCapacidadeDisponivel(dto.capacidadeDisponivel());
         
@@ -32,7 +31,6 @@ public class SessaoMapper {
             sessao.getId(),
             sessao.getInicio(),
             sessao.getFim(),
-            sessao.getPreco(),
             sessao.getCapacidadeTotal(),
             sessao.getCapacidadeDisponivel(),
             sessao.getStatus() != null ? sessao.getStatus().name() : null,

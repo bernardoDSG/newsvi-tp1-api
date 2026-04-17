@@ -5,7 +5,3 @@
 -- insert into myentity (id, field) values(3, 'field-3');
 -- alter sequence myentity_seq restart with 4;
 
-
-insert into genero (nome) values('Ação');
-insert into premio (nome,ano,categoria) values('Oscar',2024,'Melhor Ator');
-insert into ator(nome,emal,telefone,)

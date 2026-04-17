@@ -20,7 +20,6 @@ public class SalaMapper {
             sala.getId(),
             sala.getNumero(),
             sala.getCapacidade(),
-            sala.getCinema() != null ? sala.getCinema().getNome() : null,
             sala.getPoltronas() != null ? sala.getPoltronas().stream()
                 .map(p -> p.getCodigo())
                 .toList() : null

@@ -84,12 +84,7 @@ public class AtorServiceImpl implements AtorService {
         if (ator.getNome() != null && !ator.getNome().trim().isEmpty()) {
             a.setNome(ator.getNome());
         }
-        if (ator.getEmail() != null) {
-            a.setEmail(ator.getEmail());
-        }
-        if (ator.getTelefone() != null) {
-            a.setTelefone(ator.getTelefone());
-        }
+        
         if (ator.getDataNascimento() != null) {
             a.setDataNascimento(ator.getDataNascimento());
         }

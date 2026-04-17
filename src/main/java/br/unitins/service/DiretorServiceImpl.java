@@ -80,17 +80,14 @@ public class DiretorServiceImpl implements DiretorService {
         if (diretor.getNome() != null && !diretor.getNome().trim().isEmpty()) {
             d.setNome(diretor.getNome());
         }
-        if (diretor.getEmail() != null) {
-            d.setEmail(diretor.getEmail());
-        }
-        if (diretor.getTelefone() != null) {
-            d.setTelefone(diretor.getTelefone());
+        if (diretor.getDataNascimento() != null) {
+            d.setDataNascimento(diretor.getDataNascimento());
         }
         if (diretor.getNacionalidade() != null) {
             d.setNacionalidade(diretor.getNacionalidade());
         }
-        if (diretor.getBiografia() != null) {
-            d.setBiografia(diretor.getBiografia());
+        if (diretor.getUrlFoto() != null) {
+            d.setUrlFoto(diretor.getUrlFoto());
         }
     }
 }

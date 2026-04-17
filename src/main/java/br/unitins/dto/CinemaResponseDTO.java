@@ -7,6 +7,7 @@ public record CinemaResponseDTO(
     String nome,
     String cnpj,
     String telefone,
+    Long enderecoId,
     EnderecoResponseDTO endereco,
     List<String> salasNumeros
 ) {}

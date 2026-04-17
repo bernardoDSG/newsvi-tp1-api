@@ -12,9 +12,6 @@ public class CinemaMapper {
         cinema.setNome(dto.nome());
         cinema.setCnpj(dto.cnpj());
         cinema.setTelefone(dto.telefone());
-        if (dto.endereco() != null) {
-            cinema.setEndereco(EnderecoMapper.toEntity(dto.endereco()));
-        }
         return cinema;
     }
 
@@ -25,6 +22,7 @@ public class CinemaMapper {
             cinema.getNome(),
             cinema.getCnpj(),
             cinema.getTelefone(),
+            cinema.getEndereco() != null ? cinema.getEndereco().getId() : null,
             cinema.getEndereco() != null ? EnderecoMapper.toResponseDTO(cinema.getEndereco()) : null,
             cinema.getSalas() != null ? cinema.getSalas().stream()
                 .map(s -> String.valueOf(s.getNumero()))

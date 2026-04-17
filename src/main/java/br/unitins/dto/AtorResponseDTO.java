@@ -6,8 +6,8 @@ import java.util.List;
 public record AtorResponseDTO(
     Long id,
     String nome,
-    String email,
-    String telefone,
     LocalDate dataNascimento,
+    String nacionalidade,
+    String urlFoto,  // NOVO
     List<PremioResponseDTO> premios
 ) {}

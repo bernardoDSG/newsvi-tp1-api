@@ -9,6 +9,7 @@ public abstract class Pessoa extends DefaultEntity {
     private String nome;
     private LocalDate dataNascimento;
     private String nacionalidade;
+    private String urlFoto;  // NOVO
 
     public String getNome() {
         return nome;
@@ -32,5 +33,13 @@ public abstract class Pessoa extends DefaultEntity {
 
     public void setNacionalidade(String nacionalidade) {
         this.nacionalidade = nacionalidade;
+    }
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
     }
 }

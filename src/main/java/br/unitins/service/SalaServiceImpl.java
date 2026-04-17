@@ -31,6 +31,9 @@ public class SalaServiceImpl implements SalaService {
     @Override
     @Transactional
     public void delete(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         if (!repository.deleteById(id)) {
             throw new NotFoundException("Sala não encontrada com ID: " + id);
         }
@@ -43,6 +46,9 @@ public class SalaServiceImpl implements SalaService {
 
     @Override
     public Sala findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Sala sala = repository.findById(id);
         if (sala == null) {
             throw new NotFoundException("Sala não encontrada com ID: " + id);
@@ -61,18 +67,13 @@ public class SalaServiceImpl implements SalaService {
         }
         return sala;
     }
-    
-    @Override
-    public List<Sala> findByCinema(Long cinemaId) {
-        if (cinemaId == null) {
-            throw new IllegalArgumentException("Cinema ID não pode ser nulo");
-        }
-        return repository.list("cinema.id", cinemaId);
-    }
 
     @Override
     @Transactional
     public void update(Long id, Sala sala) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo");
+        }
         Sala s = findById(id);
         
         if (sala.getNumero() != null) {
@@ -80,9 +81,6 @@ public class SalaServiceImpl implements SalaService {
         }
         if (sala.getCapacidade() != null && sala.getCapacidade() > 0) {
             s.setCapacidade(sala.getCapacidade());
-        }
-        if (sala.getCinema() != null) {
-            s.setCinema(sala.getCinema());
         }
         if (sala.getPoltronas() != null) {
             s.setPoltronas(sala.getPoltronas());

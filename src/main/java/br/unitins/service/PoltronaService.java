@@ -10,7 +10,6 @@ public interface PoltronaService {
     Poltrona findById(@NotNull(message = "ID não pode ser nulo") Long id);
     List<Poltrona> findByCodigo(@NotNull(message = "Código não pode ser nulo") String codigo);
     List<Poltrona> findByDisponibilidade(@NotNull(message = "Disponibilidade não pode ser nula") Long disponibilidadeId);
-    List<Poltrona> findBySala(@NotNull(message = "Sala não pode ser nula") Long salaId);
     Poltrona create(@Valid Poltrona poltrona);
     void update(@NotNull(message = "ID não pode ser nulo") Long id, @Valid Poltrona poltrona);
     void delete(@NotNull(message = "ID não pode ser nulo") Long id);

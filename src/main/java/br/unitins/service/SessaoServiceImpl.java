@@ -35,13 +35,12 @@ public class SessaoServiceImpl implements SessaoService {
         if (sessao.getTipo() == null) {
             throw new IllegalArgumentException("Tipo de sessão é obrigatório");
         }
-        if (sessao.getPreco() == null || sessao.getPreco() <= 0) {
-            throw new IllegalArgumentException("Preço deve ser maior que zero");
-        }
         if (sessao.getCapacidadeTotal() == null || sessao.getCapacidadeTotal() <= 0) {
             throw new IllegalArgumentException("Capacidade total deve ser maior que zero");
         }
-        
+
+        // REMOVIDA: validação de preco
+
         if (sessao.getStatus() == null) {
             sessao.setStatus(StatusSessao.EM_BREVE);
         }
@@ -81,7 +80,7 @@ public class SessaoServiceImpl implements SessaoService {
         }
         return sessao;
     }
-    
+
     @Override
     public List<Sessao> findByFilme(Long filmeId) {
         if (filmeId == null) {
@@ -89,7 +88,7 @@ public class SessaoServiceImpl implements SessaoService {
         }
         return repository.findByFilme(filmeId).list();
     }
-    
+
     @Override
     public List<Sessao> findByCinema(Long cinemaId) {
         if (cinemaId == null) {
@@ -97,7 +96,7 @@ public class SessaoServiceImpl implements SessaoService {
         }
         return repository.findByCinema(cinemaId).list();
     }
-    
+
     @Override
     public List<Sessao> findByStatus(Long statusId) {
         if (statusId == null) {
@@ -105,7 +104,7 @@ public class SessaoServiceImpl implements SessaoService {
         }
         return repository.findByStatus(statusId).list();
     }
-    
+
     @Override
     public List<Sessao> findSessoesEmExibicao(LocalDateTime agora) {
         if (agora == null) {
@@ -146,9 +145,7 @@ public class SessaoServiceImpl implements SessaoService {
         if (sessao.getSalas() != null) {
             s.setSalas(sessao.getSalas());
         }
-        if (sessao.getPreco() != null && sessao.getPreco() > 0) {
-            s.setPreco(sessao.getPreco());
-        }
+        
         if (sessao.getCapacidadeTotal() != null && sessao.getCapacidadeTotal() > 0) {
             s.setCapacidadeTotal(sessao.getCapacidadeTotal());
         }

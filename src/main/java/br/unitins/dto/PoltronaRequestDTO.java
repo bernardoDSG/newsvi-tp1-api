@@ -16,8 +16,6 @@ public record PoltronaRequestDTO(
     @Positive(message = "Coluna deve ser positiva")
     Integer coluna,
     
-    Long salaId,
-    
     @NotNull(message = "Disponibilidade é obrigatória")
     @Positive(message = "ID da disponibilidade deve ser positivo")
     Long disponibilidadeId

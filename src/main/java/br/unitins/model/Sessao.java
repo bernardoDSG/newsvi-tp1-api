@@ -17,15 +17,12 @@ import jakarta.persistence.ManyToOne;
 public class Sessao extends DefaultEntity {
     private LocalDateTime inicio;
     private LocalDateTime fim;
-    private Double preco;
     private Integer capacidadeTotal;
     private Integer capacidadeDisponivel;
 
-    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
     @Convert(converter = TipoSessaoConverter.class)
     private TipoSessao tipo;
 
-    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
     @Convert(converter = StatusSessaoConverter.class)
     private StatusSessao status;
 
@@ -43,15 +40,12 @@ public class Sessao extends DefaultEntity {
                inverseJoinColumns = @JoinColumn(name = "sala_id"))
     private List<Sala> salas = new ArrayList<>();
 
-    // Getters e Setters
+    // Getters e Setters (sem preco)
     public LocalDateTime getInicio() { return inicio; }
     public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
 
     public LocalDateTime getFim() { return fim; }
     public void setFim(LocalDateTime fim) { this.fim = fim; }
-
-    public Double getPreco() { return preco; }
-    public void setPreco(Double preco) { this.preco = preco; }
 
     public Integer getCapacidadeTotal() { return capacidadeTotal; }
     public void setCapacidadeTotal(Integer capacidadeTotal) { this.capacidadeTotal = capacidadeTotal; }

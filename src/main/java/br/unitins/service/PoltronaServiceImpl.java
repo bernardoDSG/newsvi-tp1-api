@@ -71,14 +71,6 @@ public class PoltronaServiceImpl implements PoltronaService {
         }
         return repository.findByDisponibilidade(disponibilidadeId).list();
     }
-    
-    @Override
-    public List<Poltrona> findBySala(Long salaId) {
-        if (salaId == null) {
-            throw new IllegalArgumentException("Sala ID não pode ser nulo");
-        }
-        return repository.findBySala(salaId).list();
-    }
 
     @Override
     @Transactional
@@ -96,9 +88,6 @@ public class PoltronaServiceImpl implements PoltronaService {
         }
         if (poltrona.getColuna() != null) {
             p.setColuna(poltrona.getColuna());
-        }
-        if (poltrona.getSala() != null) {
-            p.setSala(poltrona.getSala());
         }
         if (poltrona.getDisponibilidade() != null) {
             p.setDisponibilidade(poltrona.getDisponibilidade());

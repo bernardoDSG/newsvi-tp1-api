@@ -5,10 +5,10 @@ import java.util.List;
 import br.unitins.dto.CinemaRequestDTO;
 import br.unitins.dto.CinemaResponseDTO;
 import br.unitins.mapper.CinemaMapper;
-import br.unitins.mapper.EnderecoMapper;
 import br.unitins.model.Cinema;
-import br.unitins.model.Endereco;
+import br.unitins.model.Sala;
 import br.unitins.repository.EnderecoRepository;
+import br.unitins.repository.SalaRepository;
 import br.unitins.service.CinemaService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -34,6 +34,9 @@ public class CinemaResource {
     
     @Inject
     EnderecoRepository enderecoRepository;
+    
+    @Inject
+    SalaRepository salaRepository;
 
     @GET
     public Response buscarTodos() {
@@ -81,13 +84,23 @@ public class CinemaResource {
     @POST
     public Response criar(@Valid CinemaRequestDTO dto) {
         try {
-            Cinema cinema = CinemaMapper.toEntity(dto);
+            var endereco = enderecoRepository.findById(dto.enderecoId());
+            if (endereco == null) {
+                return Response.status(Status.BAD_REQUEST)
+                    .entity("Endereço não encontrado com ID: " + dto.enderecoId())
+                    .build();
+            }
             
-            if (dto.endereco() != null) {
-                Endereco endereco = EnderecoMapper.toEntity(dto.endereco());
-                endereco.setCinema(cinema);
-                enderecoRepository.persist(endereco);
-                cinema.setEndereco(endereco);
+            Cinema cinema = CinemaMapper.toEntity(dto);
+            cinema.setEndereco(endereco);
+            
+            // Associar salas
+            if (dto.salasIds() != null && !dto.salasIds().isEmpty()) {
+                List<Sala> salas = dto.salasIds().stream()
+                    .map(id -> salaRepository.findById(id))
+                    .filter(s -> s != null)
+                    .toList();
+                cinema.setSalas(salas);
             }
             
             service.create(cinema);
@@ -112,24 +125,24 @@ public class CinemaResource {
                     .build();
             }
             
+            var endereco = enderecoRepository.findById(dto.enderecoId());
+            if (endereco == null) {
+                return Response.status(Status.BAD_REQUEST)
+                    .entity("Endereço não encontrado com ID: " + dto.enderecoId())
+                    .build();
+            }
+            
             Cinema cinema = CinemaMapper.toEntity(dto);
             cinema.setId(id);
+            cinema.setEndereco(endereco);
             
-            if (dto.endereco() != null) {
-                if (existing.getEndereco() != null) {
-                    existing.getEndereco().setLogradouro(dto.endereco().logradouro());
-                    existing.getEndereco().setNumero(dto.endereco().numero());
-                    existing.getEndereco().setComplemento(dto.endereco().complemento());
-                    existing.getEndereco().setBairro(dto.endereco().bairro());
-                    existing.getEndereco().setCidade(dto.endereco().cidade());
-                    existing.getEndereco().setEstado(dto.endereco().estado());
-                    existing.getEndereco().setCep(dto.endereco().cep());
-                } else {
-                    Endereco endereco = EnderecoMapper.toEntity(dto.endereco());
-                    endereco.setCinema(cinema);
-                    enderecoRepository.persist(endereco);
-                    cinema.setEndereco(endereco);
-                }
+            // Atualizar salas
+            if (dto.salasIds() != null) {
+                List<Sala> salas = dto.salasIds().stream()
+                    .map(salaId -> salaRepository.findById(salaId))
+                    .filter(s -> s != null)
+                    .toList();
+                cinema.setSalas(salas);
             }
             
             service.update(id, cinema);

@@ -15,6 +15,9 @@ abstract class Pessoa {
     - nome : String
     - dataNascimento : LocalDate
     - nacionalidade : String
+    - urlFoto : String
+    + getUrlFoto() : String
+    + setUrlFoto(String urlFoto) : void
     + getNacionalidade() : String
     + setNacionalidade(String nacionalidade) : void
     + getDataNascimento() : LocalDate

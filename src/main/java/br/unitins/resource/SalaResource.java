@@ -7,7 +7,6 @@ import br.unitins.dto.SalaResponseDTO;
 import br.unitins.mapper.SalaMapper;
 import br.unitins.model.Poltrona;
 import br.unitins.model.Sala;
-import br.unitins.repository.CinemaRepository;
 import br.unitins.repository.PoltronaRepository;
 import br.unitins.service.SalaService;
 import jakarta.inject.Inject;
@@ -33,9 +32,6 @@ public class SalaResource {
     SalaService service;
     
     @Inject
-    CinemaRepository cinemaRepository;
-    
-    @Inject
     PoltronaRepository poltronaRepository;
 
     @GET
@@ -59,54 +55,34 @@ public class SalaResource {
         Sala sala = service.findByNumero(numero);
         return Response.ok(SalaMapper.toResponseDTO(sala)).build();
     }
-    
-    @GET
-    @Path("/cinema/{cinemaId}")
-    public Response buscarPorCinema(@PathParam("cinemaId") Long cinemaId) {
-        List<SalaResponseDTO> list = service.findByCinema(cinemaId).stream()
-            .map(SalaMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhuma sala encontrada para o cinema ID: " + cinemaId)
-                .build();
-        }
-        return Response.ok(list).build();
-    }
 
-    @POST
-    public Response criar(@Valid SalaRequestDTO dto) {
-        try {
-            Sala sala = SalaMapper.toEntity(dto);
-            
-            if (dto.cinemaId() != null) {
-                var cinema = cinemaRepository.findById(dto.cinemaId());
-                if (cinema == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
-                        .build();
-                }
-                sala.setCinema(cinema);
-            }
-            
-            if (dto.poltronasIds() != null && !dto.poltronasIds().isEmpty()) {
-                List<Poltrona> poltronas = dto.poltronasIds().stream()
-                    .map(id -> poltronaRepository.findById(id))
-                    .filter(p -> p != null)
-                    .toList();
-                sala.setPoltronas(poltronas);
-            }
-            
-            service.create(sala);
-            return Response.status(Status.CREATED)
-                .entity(SalaMapper.toResponseDTO(sala))
-                .build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao criar sala: " + e.getMessage())
-                .build();
+    // No método criar, você já associa poltronas via poltronasIds
+// A sala é dona do relacionamento (unidirecional)
+
+@POST
+public Response criar(@Valid SalaRequestDTO dto) {
+    try {
+        Sala sala = SalaMapper.toEntity(dto);
+        
+        if (dto.poltronasIds() != null && !dto.poltronasIds().isEmpty()) {
+            // Buscar poltronas existentes (NÃO criar novas)
+            List<Poltrona> poltronas = dto.poltronasIds().stream()
+                .map(id -> poltronaRepository.findById(id))
+                .filter(p -> p != null)
+                .toList();
+            sala.setPoltronas(poltronas);
         }
+        
+        service.create(sala);
+        return Response.status(Status.CREATED)
+            .entity(SalaMapper.toResponseDTO(sala))
+            .build();
+    } catch (Exception e) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR)
+            .entity("Erro ao criar sala: " + e.getMessage())
+            .build();
     }
+}
 
     @PUT
     @Path("/{id}")
@@ -121,16 +97,6 @@ public class SalaResource {
             
             Sala sala = SalaMapper.toEntity(dto);
             sala.setId(id);
-            
-            if (dto.cinemaId() != null) {
-                var cinema = cinemaRepository.findById(dto.cinemaId());
-                if (cinema == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
-                        .build();
-                }
-                sala.setCinema(cinema);
-            }
             
             if (dto.poltronasIds() != null) {
                 List<Poltrona> poltronas = dto.poltronasIds().stream()

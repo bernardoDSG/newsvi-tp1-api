@@ -10,10 +10,9 @@ public class DiretorMapper {
         if (dto == null) return null;
         Diretor diretor = new Diretor();
         diretor.setNome(dto.nome());
-        diretor.setEmail(dto.email());
-        diretor.setTelefone(dto.telefone());
+        diretor.setDataNascimento(dto.dataNascimento());
         diretor.setNacionalidade(dto.nacionalidade());
-        diretor.setBiografia(dto.biografia());
+        diretor.setUrlFoto(dto.urlFoto());
         return diretor;
     }
 
@@ -22,13 +21,9 @@ public class DiretorMapper {
         return new DiretorResponseDTO(
             diretor.getId(),
             diretor.getNome(),
-            diretor.getEmail(),
-            diretor.getTelefone(),
+            diretor.getDataNascimento(),
             diretor.getNacionalidade(),
-            diretor.getBiografia(),
-            diretor.getFilmes() != null ? diretor.getFilmes().stream()
-                .map(f -> f.getNome())
-                .toList() : null
+            diretor.getUrlFoto()
         );
     }
 }

@@ -26,7 +26,6 @@ public class PoltronaMapper {
             poltrona.getCodigo(),
             poltrona.getLinha(),
             poltrona.getColuna(),
-            poltrona.getSala() != null ? String.valueOf(poltrona.getSala().getNumero()) : null,
             poltrona.getDisponibilidade() != null ? poltrona.getDisponibilidade().getNome() : null
         );
     }

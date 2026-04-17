@@ -16,10 +16,6 @@ public record SessaoRequestDTO(
     @Future(message = "Horário de fim deve ser futuro")
     LocalDateTime fim,
     
-    @NotNull(message = "Preço é obrigatório")
-    @Positive(message = "Preço deve ser positivo")
-    Double preco,
-    
     @NotNull(message = "Capacidade total é obrigatória")
     @Positive(message = "Capacidade total deve ser positiva")
     Integer capacidadeTotal,

@@ -1,6 +1,9 @@
 package br.unitins.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record CinemaRequestDTO(
@@ -15,5 +18,8 @@ public record CinemaRequestDTO(
     @Size(max = 20, message = "Telefone deve ter no máximo 20 caracteres")
     String telefone,
     
-    EnderecoRequestDTO endereco
+    @NotNull(message = "ID do endereço é obrigatório")
+    Long enderecoId,
+    
+    List<Long> salasIds
 ) {}
