@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Ator;
 import br.unitins.repository.AtorRepository;
 import br.unitins.repository.PremioRepository;
@@ -15,7 +16,7 @@ public class AtorServiceImpl implements AtorService {
 
     @Inject
     AtorRepository repository;
-    
+
     @Inject
     PremioRepository premioRepository;
 
@@ -23,7 +24,7 @@ public class AtorServiceImpl implements AtorService {
     @Transactional
     public Ator create(Ator ator) {
         if (ator.getNome() == null || ator.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do ator é obrigatório");
+            throw new ValidationException("Nome do ator é obrigatório", "nome");
         }
         repository.persist(ator);
         return ator;
@@ -64,7 +65,7 @@ public class AtorServiceImpl implements AtorService {
         }
         return repository.findByNome(nome).list();
     }
-    
+
     @Override
     public List<Ator> findByPremio(String premio) {
         if (premio == null || premio.trim().isEmpty()) {
@@ -79,17 +80,26 @@ public class AtorServiceImpl implements AtorService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Ator a = findById(id);
-        
-        if (ator.getNome() != null && !ator.getNome().trim().isEmpty()) {
-            a.setNome(ator.getNome());
+        Ator existente = findById(id);
+
+        if (ator.getNome() != null) {
+            if (ator.getNome().trim().isEmpty()) {
+                throw new ValidationException("Nome do ator é obrigatório", "nome");
+            }
+            existente.setNome(ator.getNome());
         }
-        
+
         if (ator.getDataNascimento() != null) {
-            a.setDataNascimento(ator.getDataNascimento());
+            existente.setDataNascimento(ator.getDataNascimento());
+        }
+        if (ator.getNacionalidade() != null) {
+            existente.setNacionalidade(ator.getNacionalidade());
+        }
+        if (ator.getUrlFoto() != null) {
+            existente.setUrlFoto(ator.getUrlFoto());
         }
         if (ator.getPremios() != null) {
-            a.setPremios(ator.getPremios());
+            existente.setPremios(ator.getPremios());
         }
     }
 }

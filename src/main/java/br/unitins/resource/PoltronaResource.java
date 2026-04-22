@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.unitins.dto.PoltronaRequestDTO;
 import br.unitins.dto.PoltronaResponseDTO;
+import br.unitins.exception.ValidationException;
 import br.unitins.mapper.PoltronaMapper;
 import br.unitins.model.Disponibilidade;
 import br.unitins.model.Poltrona;
@@ -26,36 +27,26 @@ import jakarta.ws.rs.core.Response.Status;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PoltronaResource {
-    
+
     @Inject
     PoltronaService service;
 
     @GET
     public Response buscarTodos() {
-        List<PoltronaResponseDTO> list = service.findAll().stream()
-            .map(PoltronaMapper::toResponseDTO)
-            .toList();
+        List<PoltronaResponseDTO> list = service.findAll().stream().map(PoltronaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
-        Poltrona poltrona = service.findById(id);
-        return Response.ok(PoltronaMapper.toResponseDTO(poltrona)).build();
+        return Response.ok(PoltronaMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @GET
     @Path("/find/{codigo}")
     public Response buscarPeloCodigo(@PathParam("codigo") String codigo) {
-        List<PoltronaResponseDTO> list = service.findByCodigo(codigo).stream()
-            .map(PoltronaMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhuma poltrona encontrada com código: " + codigo)
-                .build();
-        }
+        List<PoltronaResponseDTO> list = service.findByCodigo(codigo).stream().map(PoltronaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
@@ -65,83 +56,39 @@ public class PoltronaResource {
         List<PoltronaResponseDTO> list = service.findByDisponibilidade(disponibilidadeId).stream()
             .map(PoltronaMapper::toResponseDTO)
             .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhuma poltrona encontrada para disponibilidade ID: " + disponibilidadeId)
-                .build();
-        }
         return Response.ok(list).build();
     }
 
     @POST
     public Response criar(@Valid PoltronaRequestDTO dto) {
-        try {
-            Poltrona poltrona = PoltronaMapper.toEntity(dto);
-            
-            if (dto.disponibilidadeId() != null) {
-                Disponibilidade disponibilidade = Disponibilidade.valueOf(dto.disponibilidadeId());
-                if (disponibilidade == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Disponibilidade inválida")
-                        .build();
-                }
-                poltrona.setDisponibilidade(disponibilidade);
-            }
-            
-            service.create(poltrona);
-            return Response.status(Status.CREATED)
-                .entity(PoltronaMapper.toResponseDTO(poltrona))
-                .build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao criar poltrona: " + e.getMessage())
-                .build();
-        }
+        Poltrona poltrona = PoltronaMapper.toEntity(dto);
+        poltrona.setDisponibilidade(loadDisponibilidade(dto.disponibilidadeId()));
+        Poltrona criada = service.create(poltrona);
+        return Response.status(Status.CREATED).entity(PoltronaMapper.toResponseDTO(criada)).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response alterar(@PathParam("id") Long id, @Valid PoltronaRequestDTO dto) {
-        try {
-            Poltrona existing = service.findById(id);
-            if (existing == null) {
-                return Response.status(Status.NOT_FOUND)
-                    .entity("Poltrona não encontrada com ID: " + id)
-                    .build();
-            }
-            
-            Poltrona poltrona = PoltronaMapper.toEntity(dto);
-            poltrona.setId(id);
-            
-            if (dto.disponibilidadeId() != null) {
-                Disponibilidade disponibilidade = Disponibilidade.valueOf(dto.disponibilidadeId());
-                if (disponibilidade == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Disponibilidade inválida")
-                        .build();
-                }
-                poltrona.setDisponibilidade(disponibilidade);
-            }
-            
-            service.update(id, poltrona);
-            return Response.ok(PoltronaMapper.toResponseDTO(poltrona)).build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao atualizar poltrona: " + e.getMessage())
-                .build();
-        }
+        Poltrona poltrona = PoltronaMapper.toEntity(dto);
+        poltrona.setId(id);
+        poltrona.setDisponibilidade(loadDisponibilidade(dto.disponibilidadeId()));
+        service.update(id, poltrona);
+        return Response.ok(PoltronaMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response deletarPorId(@PathParam("id") Long id) {
-        Poltrona poltrona = service.findById(id);
-        if (poltrona == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Poltrona não encontrada com ID: " + id)
-                .build();
-        }
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();
+    }
+
+    private Disponibilidade loadDisponibilidade(Long disponibilidadeId) {
+        Disponibilidade disponibilidade = Disponibilidade.valueOf(disponibilidadeId);
+        if (disponibilidade == null) {
+            throw new ValidationException("Disponibilidade inválida", "disponibilidadeId");
+        }
+        return disponibilidade;
     }
 }

@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Filme;
 import br.unitins.repository.FilmeRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,14 +20,9 @@ public class FilmeServiceImpl implements FilmeService {
     @Transactional
     public Filme create(Filme filme) {
         if (filme.getNome() == null || filme.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do filme é obrigatório");
+            throw new ValidationException("Nome do filme é obrigatório", "nome");
         }
-        if (filme.getDuracao() != null && !filme.getDuracao().trim().isEmpty()) {
-            Integer minutos = Filme.converterDuracaoParaMinutos(filme.getDuracao());
-            if (minutos == null || minutos <= 0) {
-                throw new IllegalArgumentException("Formato de duração inválido");
-            }
-        }
+        validateDuracao(filme.getDuracao());
         repository.persist(filme);
         return filme;
     }
@@ -82,7 +78,7 @@ public class FilmeServiceImpl implements FilmeService {
         }
         return repository.findByAtor(ator).list();
     }
-    
+
     @Override
     public List<Filme> findByDiretor(Long diretorId) {
         if (diretorId == null) {
@@ -108,43 +104,56 @@ public class FilmeServiceImpl implements FilmeService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Filme f = findById(id);
-        
-        if (filme.getNome() != null && !filme.getNome().trim().isEmpty()) {
-            f.setNome(filme.getNome());
+        Filme existente = findById(id);
+
+        if (filme.getNome() != null) {
+            if (filme.getNome().trim().isEmpty()) {
+                throw new ValidationException("Nome do filme é obrigatório", "nome");
+            }
+            existente.setNome(filme.getNome());
         }
         if (filme.getDuracao() != null) {
-            f.setDuracao(filme.getDuracao());
+            validateDuracao(filme.getDuracao());
+            existente.setDuracao(filme.getDuracao());
         }
         if (filme.getSinopse() != null) {
-            f.setSinopse(filme.getSinopse());
+            existente.setSinopse(filme.getSinopse());
         }
         if (filme.getIdiomaOriginal() != null) {
-            f.setIdiomaOriginal(filme.getIdiomaOriginal());
+            existente.setIdiomaOriginal(filme.getIdiomaOriginal());
         }
         if (filme.getAnoLancamento() != null) {
-            f.setAnoLancamento(filme.getAnoLancamento());
+            existente.setAnoLancamento(filme.getAnoLancamento());
         }
         if (filme.getImagemPoster() != null) {
-            f.setImagemPoster(filme.getImagemPoster());
+            existente.setImagemPoster(filme.getImagemPoster());
         }
         if (filme.getTrailerUrl() != null) {
-            f.setTrailerUrl(filme.getTrailerUrl());
+            existente.setTrailerUrl(filme.getTrailerUrl());
         }
         if (filme.getDiretor() != null) {
-            f.setDiretor(filme.getDiretor());
+            existente.setDiretor(filme.getDiretor());
         }
         if (filme.getClassificacaoIndicativa() != null) {
-            f.setClassificacaoIndicativa(filme.getClassificacaoIndicativa());
+            existente.setClassificacaoIndicativa(filme.getClassificacaoIndicativa());
         }
         if (filme.getGeneros() != null) {
-            f.setGeneros(filme.getGeneros());
+            existente.setGeneros(filme.getGeneros());
         }
         if (filme.getAtores() != null) {
-            f.setAtores(filme.getAtores());
+            existente.setAtores(filme.getAtores());
         }
         if (filme.getPremios() != null) {
-            f.setPremios(filme.getPremios());
+            existente.setPremios(filme.getPremios());
+        }
+    }
+
+    private void validateDuracao(String duracao) {
+        if (duracao != null && !duracao.trim().isEmpty()) {
+            Integer minutos = Filme.converterDuracaoParaMinutos(duracao);
+            if (minutos == null || minutos <= 0) {
+                throw new ValidationException("Formato de duração inválido", "duracao");
+            }
         }
     }
 }

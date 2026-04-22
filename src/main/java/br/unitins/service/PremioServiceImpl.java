@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Premio;
 import br.unitins.repository.PremioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,10 +20,10 @@ public class PremioServiceImpl implements PremioService {
     @Transactional
     public Premio create(Premio premio) {
         if (premio.getNome() == null || premio.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do prêmio é obrigatório");
+            throw new ValidationException("Nome do prêmio é obrigatório", "nome");
         }
         if (premio.getAno() == null) {
-            throw new IllegalArgumentException("Ano é obrigatório");
+            throw new ValidationException("Ano é obrigatório", "ano");
         }
         repository.persist(premio);
         return premio;
@@ -63,7 +64,7 @@ public class PremioServiceImpl implements PremioService {
         }
         return repository.findByNome(nome).list();
     }
-    
+
     @Override
     public List<Premio> findByCategoria(String categoria) {
         if (categoria == null || categoria.trim().isEmpty()) {
@@ -78,16 +79,19 @@ public class PremioServiceImpl implements PremioService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Premio p = findById(id);
-        
-        if (premio.getNome() != null && !premio.getNome().trim().isEmpty()) {
-            p.setNome(premio.getNome());
+        Premio existente = findById(id);
+
+        if (premio.getNome() != null) {
+            if (premio.getNome().trim().isEmpty()) {
+                throw new ValidationException("Nome do prêmio é obrigatório", "nome");
+            }
+            existente.setNome(premio.getNome());
         }
         if (premio.getAno() != null) {
-            p.setAno(premio.getAno());
+            existente.setAno(premio.getAno());
         }
         if (premio.getCategoria() != null) {
-            p.setCategoria(premio.getCategoria());
+            existente.setCategoria(premio.getCategoria());
         }
     }
 }

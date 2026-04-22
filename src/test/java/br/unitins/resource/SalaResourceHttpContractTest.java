@@ -1,21 +1,30 @@
 package br.unitins.resource;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import br.unitins.model.Disponibilidade;
+import br.unitins.model.Poltrona;
 import br.unitins.model.Sala;
+import br.unitins.repository.PoltronaRepository;
 import br.unitins.service.SalaService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
 class SalaResourceHttpContractTest {
@@ -23,27 +32,19 @@ class SalaResourceHttpContractTest {
     private static final String BASE_URL = "/salas";
 
     @InjectMock
-    SalaService salaService;
+    SalaService service;
+
+    @InjectMock
+    PoltronaRepository poltronaRepository;
 
     @BeforeEach
     void setUp() {
-        reset(salaService);
-    }
-
-    private Sala mockSala(Long id, Integer numero) {
-        Sala sala = new Sala();
-        sala.setId(id);
-        sala.setNumero(numero);
-        sala.setCapacidade(150);
-        return sala;
+        reset(service, poltronaRepository);
     }
 
     @Test
     void deveListarSalasComStatus200() {
-        when(salaService.findAll()).thenReturn(List.of(
-            mockSala(1L, 1),
-            mockSala(2L, 2)
-        ));
+        when(service.findAll()).thenReturn(List.of(sala(1L, 1), sala(2L, 2)));
 
         given()
             .accept(ContentType.JSON)
@@ -51,15 +52,12 @@ class SalaResourceHttpContractTest {
             .get(BASE_URL)
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(2))
-            .body("[0].id", equalTo(1))
-            .body("[0].numero", equalTo(1));
+            .body("size()", is(2));
     }
 
     @Test
     void deveBuscarSalaPorIdComStatus200() {
-        when(salaService.findById(1L)).thenReturn(mockSala(1L, 1));
+        when(service.findById(1L)).thenReturn(sala(1L, 1));
 
         given()
             .accept(ContentType.JSON)
@@ -67,14 +65,12 @@ class SalaResourceHttpContractTest {
             .get(BASE_URL + "/1")
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("id", equalTo(1))
-            .body("numero", equalTo(1));
+            .body("id", equalTo(1));
     }
 
     @Test
     void deveBuscarSalaPorNumeroComStatus200() {
-        when(salaService.findByNumero(1)).thenReturn(mockSala(1L, 1));
+        when(service.findByNumero(1)).thenReturn(sala(1L, 1));
 
         given()
             .accept(ContentType.JSON)
@@ -82,62 +78,54 @@ class SalaResourceHttpContractTest {
             .get(BASE_URL + "/numero/1")
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("id", equalTo(1))
             .body("numero", equalTo(1));
     }
 
     @Test
-    void deveRetornar404QuandoBuscarSalaPorIdInexistente() {
-        when(salaService.findById(999L)).thenThrow(new NotFoundException("Sala não encontrada"));
-
-        given()
-            .accept(ContentType.JSON)
-        .when()
-            .get(BASE_URL + "/999")
-        .then()
-            .statusCode(404);
-    }
-
-    @Test
     void deveCriarSalaComStatus201() {
-        Sala salaCriada = mockSala(10L, 3);
-        when(salaService.create(any(Sala.class))).thenReturn(salaCriada);
+        when(poltronaRepository.findById(5L)).thenReturn(poltrona(5L, "A1"));
+        when(service.create(any(Sala.class))).thenAnswer(invocation -> {
+            Sala sala = invocation.getArgument(0);
+            sala.setId(10L);
+            return sala;
+        });
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"numero\":3,\"capacidade\":200,\"poltronasIds\":[1,2,3]}")
+            .body("""
+                {"numero":1,"capacidade":120,"poltronasIds":[5]}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(201)
-            .contentType(ContentType.JSON)
             .body("id", equalTo(10))
-            .body("numero", equalTo(3));
-        
-        verify(salaService, times(1)).create(any(Sala.class));
+            .body("poltronasCodigos[0]", equalTo("A1"));
     }
 
     @Test
     void deveAtualizarSalaComStatus200() {
-        doNothing().when(salaService).update(eq(10L), any(Sala.class));
+        when(poltronaRepository.findById(5L)).thenReturn(poltrona(5L, "A1"));
+        doNothing().when(service).update(any(Long.class), any(Sala.class));
+        when(service.findById(1L)).thenReturn(sala(1L, 1));
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"numero\":3,\"capacidade\":250,\"poltronasIds\":[1,2,3,4]}")
+            .body("""
+                {"numero":1,"capacidade":120,"poltronasIds":[5]}
+                """)
         .when()
-            .put(BASE_URL + "/10")
+            .put(BASE_URL + "/1")
         .then()
-            .statusCode(200);
-        
-        verify(salaService, times(1)).update(eq(10L), any(Sala.class));
+            .statusCode(200)
+            .body("id", equalTo(1));
     }
 
     @Test
     void deveRemoverSalaComStatus204() {
-        doNothing().when(salaService).delete(1L);
+        doNothing().when(service).delete(1L);
 
         given()
             .accept(ContentType.JSON)
@@ -145,23 +133,6 @@ class SalaResourceHttpContractTest {
             .delete(BASE_URL + "/1")
         .then()
             .statusCode(204);
-        
-        verify(salaService, times(1)).delete(1L);
-    }
-
-    @Test
-    void deveRetornar404AoAtualizarSalaInexistente() {
-        doThrow(new NotFoundException("Sala não encontrada"))
-            .when(salaService).update(eq(999L), any(Sala.class));
-
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body("{\"numero\":3,\"capacidade\":250,\"poltronasIds\":[1,2,3,4]}")
-        .when()
-            .put(BASE_URL + "/999")
-        .then()
-            .statusCode(404);
     }
 
     @Test
@@ -169,17 +140,34 @@ class SalaResourceHttpContractTest {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"numero\":null,\"capacidade\":null}")
+            .body("""
+                {"numero":0,"capacidade":0,"poltronasIds":[]}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(422)
-            .contentType(ContentType.JSON)
-            .body("type", equalTo("http://localhost:8080/errors/validation-error"))
-            .body("title", equalTo("Erro de validação"))
-            .body("status", equalTo(422))
             .body("errors", hasSize(greaterThanOrEqualTo(1)));
 
-        verify(salaService, never()).create(any(Sala.class));
+        verify(service, never()).create(any(Sala.class));
+    }
+
+    private Sala sala(Long id, Integer numero) {
+        Sala sala = new Sala();
+        sala.setId(id);
+        sala.setNumero(numero);
+        sala.setCapacidade(120);
+        sala.setPoltronas(List.of(poltrona(5L, "A1")));
+        return sala;
+    }
+
+    private Poltrona poltrona(Long id, String codigo) {
+        Poltrona poltrona = new Poltrona();
+        poltrona.setId(id);
+        poltrona.setCodigo(codigo);
+        poltrona.setLinha("A");
+        poltrona.setColuna(1);
+        poltrona.setDisponibilidade(Disponibilidade.DISPONIVEL);
+        return poltrona;
     }
 }

@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Diretor;
 import br.unitins.repository.DiretorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +20,7 @@ public class DiretorServiceImpl implements DiretorService {
     @Transactional
     public Diretor create(Diretor diretor) {
         if (diretor.getNome() == null || diretor.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do diretor é obrigatório");
+            throw new ValidationException("Nome do diretor é obrigatório", "nome");
         }
         repository.persist(diretor);
         return diretor;
@@ -60,7 +61,7 @@ public class DiretorServiceImpl implements DiretorService {
         }
         return repository.findByNome(nome).list();
     }
-    
+
     @Override
     public List<Diretor> findByNacionalidade(String nacionalidade) {
         if (nacionalidade == null || nacionalidade.trim().isEmpty()) {
@@ -75,19 +76,22 @@ public class DiretorServiceImpl implements DiretorService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Diretor d = findById(id);
-        
-        if (diretor.getNome() != null && !diretor.getNome().trim().isEmpty()) {
-            d.setNome(diretor.getNome());
+        Diretor existente = findById(id);
+
+        if (diretor.getNome() != null) {
+            if (diretor.getNome().trim().isEmpty()) {
+                throw new ValidationException("Nome do diretor é obrigatório", "nome");
+            }
+            existente.setNome(diretor.getNome());
         }
         if (diretor.getDataNascimento() != null) {
-            d.setDataNascimento(diretor.getDataNascimento());
+            existente.setDataNascimento(diretor.getDataNascimento());
         }
         if (diretor.getNacionalidade() != null) {
-            d.setNacionalidade(diretor.getNacionalidade());
+            existente.setNacionalidade(diretor.getNacionalidade());
         }
         if (diretor.getUrlFoto() != null) {
-            d.setUrlFoto(diretor.getUrlFoto());
+            existente.setUrlFoto(diretor.getUrlFoto());
         }
     }
 }

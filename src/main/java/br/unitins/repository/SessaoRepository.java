@@ -1,6 +1,7 @@
 package br.unitins.repository;
 
 import br.unitins.model.Sessao;
+import br.unitins.model.StatusSessao;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,11 +19,12 @@ public class SessaoRepository implements PanacheRepository<Sessao> {
     }
     
     public PanacheQuery<Sessao> findByStatus(Long statusId) {
-        return find("status.id", statusId);
+        StatusSessao status = StatusSessao.valueOf(statusId);
+        return find("status", status);
     }
     
     public PanacheQuery<Sessao> findSessoesEmExibicao(LocalDateTime agora) {
-        return find("inicio <= ?1 AND fim >= ?1 AND status.id = 2", agora);
+        return find("inicio <= ?1 AND fim >= ?1 AND status = ?2", agora, StatusSessao.EM_EXIBICAO);
     }
     
     public long countConflitoHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim, Long sessaoId) {

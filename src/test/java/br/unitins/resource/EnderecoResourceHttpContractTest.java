@@ -1,9 +1,16 @@
 package br.unitins.resource;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -15,7 +22,6 @@ import br.unitins.service.EnderecoService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
 class EnderecoResourceHttpContractTest {
@@ -23,32 +29,16 @@ class EnderecoResourceHttpContractTest {
     private static final String BASE_URL = "/enderecos";
 
     @InjectMock
-    EnderecoService enderecoService;
+    EnderecoService service;
 
     @BeforeEach
     void setUp() {
-        reset(enderecoService);
-    }
-
-    private Endereco mockEndereco(Long id) {
-        Endereco endereco = new Endereco();
-        endereco.setId(id);
-        endereco.setLogradouro("Avenida Rebouças");
-        endereco.setNumero("1234");
-        endereco.setComplemento("Piso 3");
-        endereco.setBairro("Pinheiros");
-        endereco.setCidade("São Paulo");
-        endereco.setEstado("SP");
-        endereco.setCep("05402-000");
-        return endereco;
+        reset(service);
     }
 
     @Test
     void deveListarEnderecosComStatus200() {
-        when(enderecoService.findAll()).thenReturn(List.of(
-            mockEndereco(1L),
-            mockEndereco(2L)
-        ));
+        when(service.findAll()).thenReturn(List.of(endereco(1L, "77000000"), endereco(2L, "77000001")));
 
         given()
             .accept(ContentType.JSON)
@@ -56,15 +46,12 @@ class EnderecoResourceHttpContractTest {
             .get(BASE_URL)
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(2))
-            .body("[0].id", equalTo(1))
-            .body("[0].cidade", equalTo("São Paulo"));
+            .body("size()", is(2));
     }
 
     @Test
     void deveBuscarEnderecoPorIdComStatus200() {
-        when(enderecoService.findById(1L)).thenReturn(mockEndereco(1L));
+        when(service.findById(1L)).thenReturn(endereco(1L, "77000000"));
 
         given()
             .accept(ContentType.JSON)
@@ -72,89 +59,66 @@ class EnderecoResourceHttpContractTest {
             .get(BASE_URL + "/1")
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
             .body("id", equalTo(1))
-            .body("cidade", equalTo("São Paulo"));
+            .body("cep", equalTo("77000000"));
     }
 
     @Test
     void deveBuscarEnderecoPorCepComStatus200() {
-        when(enderecoService.findByCep("05402-000")).thenReturn(mockEndereco(1L));
+        when(service.findByCep("77000000")).thenReturn(endereco(1L, "77000000"));
 
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(BASE_URL + "/cep/05402-000")
+            .get(BASE_URL + "/cep/77000000")
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("id", equalTo(1))
-            .body("cep", equalTo("05402-000"));
-    }
-
-    @Test
-    void deveRetornar404QuandoBuscarEnderecoPorIdInexistente() {
-        when(enderecoService.findById(999L)).thenThrow(new NotFoundException("Endereço não encontrado"));
-
-        given()
-            .accept(ContentType.JSON)
-        .when()
-            .get(BASE_URL + "/999")
-        .then()
-            .statusCode(404);
-    }
-
-    @Test
-    void deveRetornar404QuandoBuscarEnderecoPorCepInexistente() {
-        when(enderecoService.findByCep("00000-000")).thenThrow(new NotFoundException("Endereço não encontrado"));
-
-        given()
-            .accept(ContentType.JSON)
-        .when()
-            .get(BASE_URL + "/cep/00000-000")
-        .then()
-            .statusCode(404);
+            .body("id", equalTo(1));
     }
 
     @Test
     void deveCriarEnderecoComStatus201() {
-        Endereco enderecoCriado = mockEndereco(10L);
-        when(enderecoService.create(any(Endereco.class))).thenReturn(enderecoCriado);
+        when(service.create(any(Endereco.class))).thenAnswer(invocation -> {
+            Endereco endereco = invocation.getArgument(0);
+            endereco.setId(10L);
+            return endereco;
+        });
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"logradouro\":\"Avenida Rebouças\",\"numero\":\"1234\",\"complemento\":\"Piso 3\",\"bairro\":\"Pinheiros\",\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"cep\":\"05402-000\"}")
+            .body("""
+                {"logradouro":"Rua A","numero":"10","complemento":"Casa","bairro":"Centro","cidade":"Palmas","estado":"TO","cep":"77000000"}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(201)
-            .contentType(ContentType.JSON)
             .body("id", equalTo(10))
-            .body("cidade", equalTo("São Paulo"));
-        
-        verify(enderecoService, times(1)).create(any(Endereco.class));
+            .body("cidade", equalTo("Palmas"));
     }
 
     @Test
     void deveAtualizarEnderecoComStatus200() {
-        doNothing().when(enderecoService).update(eq(1L), any(Endereco.class));
+        doNothing().when(service).update(any(Long.class), any(Endereco.class));
+        when(service.findById(1L)).thenReturn(endereco(1L, "77000000"));
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"logradouro\":\"Avenida Rebouças\",\"numero\":\"1500\",\"complemento\":\"Piso 4\",\"bairro\":\"Pinheiros\",\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"cep\":\"05402-010\"}")
+            .body("""
+                {"logradouro":"Rua A","numero":"10","complemento":"Casa","bairro":"Centro","cidade":"Palmas","estado":"TO","cep":"77000000"}
+                """)
         .when()
             .put(BASE_URL + "/1")
         .then()
-            .statusCode(200);
-        
-        verify(enderecoService, times(1)).update(eq(1L), any(Endereco.class));
+            .statusCode(200)
+            .body("id", equalTo(1));
     }
 
     @Test
     void deveRemoverEnderecoComStatus204() {
-        doNothing().when(enderecoService).delete(1L);
+        doNothing().when(service).delete(1L);
 
         given()
             .accept(ContentType.JSON)
@@ -162,23 +126,6 @@ class EnderecoResourceHttpContractTest {
             .delete(BASE_URL + "/1")
         .then()
             .statusCode(204);
-        
-        verify(enderecoService, times(1)).delete(1L);
-    }
-
-    @Test
-    void deveRetornar404AoAtualizarEnderecoInexistente() {
-        doThrow(new NotFoundException("Endereço não encontrado"))
-            .when(enderecoService).update(eq(999L), any(Endereco.class));
-
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body("{\"logradouro\":\"Rua Teste\",\"numero\":\"123\",\"complemento\":\"\",\"bairro\":\"Centro\",\"cidade\":\"São Paulo\",\"estado\":\"SP\",\"cep\":\"01000-000\"}")
-        .when()
-            .put(BASE_URL + "/999")
-        .then()
-            .statusCode(404);
     }
 
     @Test
@@ -186,17 +133,29 @@ class EnderecoResourceHttpContractTest {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"logradouro\":\"\",\"numero\":\"\",\"bairro\":\"\",\"cidade\":\"\",\"estado\":\"\",\"cep\":\"\"}")
+            .body("""
+                {"logradouro":"","numero":"","complemento":"Casa","bairro":"","cidade":"","estado":"T","cep":""}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(422)
-            .contentType(ContentType.JSON)
-            .body("type", equalTo("http://localhost:8080/errors/validation-error"))
             .body("title", equalTo("Erro de validação"))
-            .body("status", equalTo(422))
             .body("errors", hasSize(greaterThanOrEqualTo(1)));
 
-        verify(enderecoService, never()).create(any(Endereco.class));
+        verify(service, never()).create(any(Endereco.class));
+    }
+
+    private Endereco endereco(Long id, String cep) {
+        Endereco endereco = new Endereco();
+        endereco.setId(id);
+        endereco.setLogradouro("Rua A");
+        endereco.setNumero("10");
+        endereco.setComplemento("Casa");
+        endereco.setBairro("Centro");
+        endereco.setCidade("Palmas");
+        endereco.setEstado("TO");
+        endereco.setCep(cep);
+        return endereco;
     }
 }

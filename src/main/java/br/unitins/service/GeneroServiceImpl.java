@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Genero;
 import br.unitins.repository.GeneroRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +20,7 @@ public class GeneroServiceImpl implements GeneroService {
     @Transactional
     public Genero create(Genero genero) {
         if (genero.getNome() == null || genero.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do gênero é obrigatório");
+            throw new ValidationException("Nome do gênero é obrigatório", "nome");
         }
         repository.persist(genero);
         return genero;
@@ -67,9 +68,12 @@ public class GeneroServiceImpl implements GeneroService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Genero g = findById(id);
-        if (genero.getNome() != null && !genero.getNome().trim().isEmpty()) {
-            g.setNome(genero.getNome());
+        Genero existente = findById(id);
+        if (genero.getNome() != null) {
+            if (genero.getNome().trim().isEmpty()) {
+                throw new ValidationException("Nome do gênero é obrigatório", "nome");
+            }
+            existente.setNome(genero.getNome());
         }
     }
 }

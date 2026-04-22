@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.unitins.dto.SalaRequestDTO;
 import br.unitins.dto.SalaResponseDTO;
+import br.unitins.exception.ValidationException;
 import br.unitins.mapper.SalaMapper;
 import br.unitins.model.Poltrona;
 import br.unitins.model.Sala;
@@ -27,104 +28,70 @@ import jakarta.ws.rs.core.Response.Status;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SalaResource {
-    
+
     @Inject
     SalaService service;
-    
+
     @Inject
     PoltronaRepository poltronaRepository;
 
     @GET
     public Response buscarTodos() {
-        List<SalaResponseDTO> list = service.findAll().stream()
-            .map(SalaMapper::toResponseDTO)
-            .toList();
+        List<SalaResponseDTO> list = service.findAll().stream().map(SalaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
-        Sala sala = service.findById(id);
-        return Response.ok(SalaMapper.toResponseDTO(sala)).build();
+        return Response.ok(SalaMapper.toResponseDTO(service.findById(id))).build();
     }
-    
+
     @GET
     @Path("/numero/{numero}")
     public Response buscarPorNumero(@PathParam("numero") Integer numero) {
-        Sala sala = service.findByNumero(numero);
-        return Response.ok(SalaMapper.toResponseDTO(sala)).build();
+        return Response.ok(SalaMapper.toResponseDTO(service.findByNumero(numero))).build();
     }
 
-    // No método criar, você já associa poltronas via poltronasIds
-// A sala é dona do relacionamento (unidirecional)
-
-@POST
-public Response criar(@Valid SalaRequestDTO dto) {
-    try {
+    @POST
+    public Response criar(@Valid SalaRequestDTO dto) {
         Sala sala = SalaMapper.toEntity(dto);
-        
-        if (dto.poltronasIds() != null && !dto.poltronasIds().isEmpty()) {
-            // Buscar poltronas existentes (NÃO criar novas)
-            List<Poltrona> poltronas = dto.poltronasIds().stream()
-                .map(id -> poltronaRepository.findById(id))
-                .filter(p -> p != null)
-                .toList();
-            sala.setPoltronas(poltronas);
-        }
-        
-        service.create(sala);
-        return Response.status(Status.CREATED)
-            .entity(SalaMapper.toResponseDTO(sala))
-            .build();
-    } catch (Exception e) {
-        return Response.status(Status.INTERNAL_SERVER_ERROR)
-            .entity("Erro ao criar sala: " + e.getMessage())
-            .build();
+        sala.setPoltronas(loadPoltronas(dto.poltronasIds()));
+        Sala criada = service.create(sala);
+        return Response.status(Status.CREATED).entity(SalaMapper.toResponseDTO(criada)).build();
     }
-}
 
     @PUT
     @Path("/{id}")
     public Response alterar(@PathParam("id") Long id, @Valid SalaRequestDTO dto) {
-        try {
-            Sala existing = service.findById(id);
-            if (existing == null) {
-                return Response.status(Status.NOT_FOUND)
-                    .entity("Sala não encontrada com ID: " + id)
-                    .build();
-            }
-            
-            Sala sala = SalaMapper.toEntity(dto);
-            sala.setId(id);
-            
-            if (dto.poltronasIds() != null) {
-                List<Poltrona> poltronas = dto.poltronasIds().stream()
-                    .map(poltronaId -> poltronaRepository.findById(poltronaId))
-                    .filter(p -> p != null)
-                    .toList();
-                sala.setPoltronas(poltronas);
-            }
-            
-            service.update(id, sala);
-            return Response.ok(SalaMapper.toResponseDTO(sala)).build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao atualizar sala: " + e.getMessage())
-                .build();
+        Sala sala = SalaMapper.toEntity(dto);
+        sala.setId(id);
+        if (dto.poltronasIds() != null) {
+            sala.setPoltronas(loadPoltronas(dto.poltronasIds()));
         }
+        service.update(id, sala);
+        return Response.ok(SalaMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response deletarPorId(@PathParam("id") Long id) {
-        Sala sala = service.findById(id);
-        if (sala == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Sala não encontrada com ID: " + id)
-                .build();
-        }
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();
+    }
+
+    private List<Poltrona> loadPoltronas(List<Long> poltronasIds) {
+        if (poltronasIds == null) {
+            return null;
+        }
+        return poltronasIds.stream().map(this::loadPoltrona).toList();
+    }
+
+    private Poltrona loadPoltrona(Long poltronaId) {
+        Poltrona poltrona = poltronaRepository.findById(poltronaId);
+        if (poltrona == null) {
+            throw new ValidationException("Poltrona informada não existe: " + poltronaId, "poltronasIds");
+        }
+        return poltrona;
     }
 }

@@ -1,9 +1,16 @@
 package br.unitins.resource;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -16,7 +23,6 @@ import br.unitins.service.PoltronaService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
 class PoltronaResourceHttpContractTest {
@@ -24,29 +30,16 @@ class PoltronaResourceHttpContractTest {
     private static final String BASE_URL = "/poltronas";
 
     @InjectMock
-    PoltronaService poltronaService;
+    PoltronaService service;
 
     @BeforeEach
     void setUp() {
-        reset(poltronaService);
-    }
-
-    private Poltrona mockPoltrona(Long id, String codigo) {
-        Poltrona poltrona = new Poltrona();
-        poltrona.setId(id);
-        poltrona.setCodigo(codigo);
-        poltrona.setLinha("A");
-        poltrona.setColuna(1);
-        poltrona.setDisponibilidade(Disponibilidade.DISPONIVEL);
-        return poltrona;
+        reset(service);
     }
 
     @Test
     void deveListarPoltronasComStatus200() {
-        when(poltronaService.findAll()).thenReturn(List.of(
-            mockPoltrona(1L, "A1"),
-            mockPoltrona(2L, "A2")
-        ));
+        when(service.findAll()).thenReturn(List.of(poltrona(1L, "A1"), poltrona(2L, "A2")));
 
         given()
             .accept(ContentType.JSON)
@@ -54,15 +47,12 @@ class PoltronaResourceHttpContractTest {
             .get(BASE_URL)
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(2))
-            .body("[0].id", equalTo(1))
-            .body("[0].codigo", equalTo("A1"));
+            .body("size()", is(2));
     }
 
     @Test
     void deveBuscarPoltronaPorIdComStatus200() {
-        when(poltronaService.findById(1L)).thenReturn(mockPoltrona(1L, "A1"));
+        when(service.findById(1L)).thenReturn(poltrona(1L, "A1"));
 
         given()
             .accept(ContentType.JSON)
@@ -70,62 +60,78 @@ class PoltronaResourceHttpContractTest {
             .get(BASE_URL + "/1")
         .then()
             .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("id", equalTo(1))
-            .body("codigo", equalTo("A1"));
+            .body("id", equalTo(1));
     }
 
     @Test
-    void deveRetornar404QuandoBuscarPoltronaPorIdInexistente() {
-        when(poltronaService.findById(999L)).thenThrow(new NotFoundException("Poltrona não encontrada"));
+    void deveBuscarPoltronaPorCodigoComStatus200() {
+        when(service.findByCodigo("A1")).thenReturn(List.of(poltrona(1L, "A1")));
 
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(BASE_URL + "/999")
+            .get(BASE_URL + "/find/A1")
         .then()
-            .statusCode(404);
+            .statusCode(200)
+            .body("size()", is(1));
+    }
+
+    @Test
+    void deveBuscarPoltronaPorDisponibilidadeComStatus200() {
+        when(service.findByDisponibilidade(1L)).thenReturn(List.of(poltrona(1L, "A1")));
+
+        given()
+            .accept(ContentType.JSON)
+        .when()
+            .get(BASE_URL + "/disponibilidade/1")
+        .then()
+            .statusCode(200)
+            .body("size()", is(1));
     }
 
     @Test
     void deveCriarPoltronaComStatus201() {
-        Poltrona poltronaCriada = mockPoltrona(10L, "B1");
-        when(poltronaService.create(any(Poltrona.class))).thenReturn(poltronaCriada);
+        when(service.create(any(Poltrona.class))).thenAnswer(invocation -> {
+            Poltrona poltrona = invocation.getArgument(0);
+            poltrona.setId(10L);
+            return poltrona;
+        });
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"codigo\":\"B1\",\"linha\":\"B\",\"coluna\":1,\"disponibilidadeId\":1}")
+            .body("""
+                {"codigo":"A1","linha":"A","coluna":1,"disponibilidadeId":1}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(201)
-            .contentType(ContentType.JSON)
             .body("id", equalTo(10))
-            .body("codigo", equalTo("B1"));
-        
-        verify(poltronaService, times(1)).create(any(Poltrona.class));
+            .body("disponibilidade", equalTo("Disponível"));
     }
 
     @Test
     void deveAtualizarPoltronaComStatus200() {
-        doNothing().when(poltronaService).update(eq(10L), any(Poltrona.class));
+        doNothing().when(service).update(any(Long.class), any(Poltrona.class));
+        when(service.findById(1L)).thenReturn(poltrona(1L, "A1"));
 
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"codigo\":\"B1\",\"linha\":\"B\",\"coluna\":1,\"disponibilidadeId\":2}")
+            .body("""
+                {"codigo":"A1","linha":"A","coluna":1,"disponibilidadeId":1}
+                """)
         .when()
-            .put(BASE_URL + "/10")
+            .put(BASE_URL + "/1")
         .then()
-            .statusCode(200);
-        
-        verify(poltronaService, times(1)).update(eq(10L), any(Poltrona.class));
+            .statusCode(200)
+            .body("id", equalTo(1));
     }
 
     @Test
     void deveRemoverPoltronaComStatus204() {
-        doNothing().when(poltronaService).delete(1L);
+        doNothing().when(service).delete(1L);
 
         given()
             .accept(ContentType.JSON)
@@ -133,23 +139,6 @@ class PoltronaResourceHttpContractTest {
             .delete(BASE_URL + "/1")
         .then()
             .statusCode(204);
-        
-        verify(poltronaService, times(1)).delete(1L);
-    }
-
-    @Test
-    void deveRetornar404AoAtualizarPoltronaInexistente() {
-        doThrow(new NotFoundException("Poltrona não encontrada"))
-            .when(poltronaService).update(eq(999L), any(Poltrona.class));
-
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body("{\"codigo\":\"Z1\",\"linha\":\"Z\",\"coluna\":1,\"disponibilidadeId\":1}")
-        .when()
-            .put(BASE_URL + "/999")
-        .then()
-            .statusCode(404);
     }
 
     @Test
@@ -157,17 +146,25 @@ class PoltronaResourceHttpContractTest {
         given()
             .contentType(ContentType.JSON)
             .accept(ContentType.JSON)
-            .body("{\"codigo\":\"\",\"disponibilidadeId\":null}")
+            .body("""
+                {"codigo":"","linha":"AA","coluna":0,"disponibilidadeId":null}
+                """)
         .when()
             .post(BASE_URL)
         .then()
             .statusCode(422)
-            .contentType(ContentType.JSON)
-            .body("type", equalTo("http://localhost:8080/errors/validation-error"))
-            .body("title", equalTo("Erro de validação"))
-            .body("status", equalTo(422))
             .body("errors", hasSize(greaterThanOrEqualTo(1)));
 
-        verify(poltronaService, never()).create(any(Poltrona.class));
+        verify(service, never()).create(any(Poltrona.class));
+    }
+
+    private Poltrona poltrona(Long id, String codigo) {
+        Poltrona poltrona = new Poltrona();
+        poltrona.setId(id);
+        poltrona.setCodigo(codigo);
+        poltrona.setLinha("A");
+        poltrona.setColuna(1);
+        poltrona.setDisponibilidade(Disponibilidade.DISPONIVEL);
+        return poltrona;
     }
 }

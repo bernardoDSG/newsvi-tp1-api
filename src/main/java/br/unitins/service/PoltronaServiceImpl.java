@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Poltrona;
 import br.unitins.repository.PoltronaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,10 +20,10 @@ public class PoltronaServiceImpl implements PoltronaService {
     @Transactional
     public Poltrona create(Poltrona poltrona) {
         if (poltrona.getCodigo() == null || poltrona.getCodigo().trim().isEmpty()) {
-            throw new IllegalArgumentException("Código da poltrona é obrigatório");
+            throw new ValidationException("Código da poltrona é obrigatório", "codigo");
         }
         if (poltrona.getDisponibilidade() == null) {
-            throw new IllegalArgumentException("Disponibilidade é obrigatória");
+            throw new ValidationException("Disponibilidade é obrigatória", "disponibilidadeId");
         }
         repository.persist(poltrona);
         return poltrona;
@@ -78,19 +79,22 @@ public class PoltronaServiceImpl implements PoltronaService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Poltrona p = findById(id);
-        
-        if (poltrona.getCodigo() != null && !poltrona.getCodigo().trim().isEmpty()) {
-            p.setCodigo(poltrona.getCodigo());
+        Poltrona existente = findById(id);
+
+        if (poltrona.getCodigo() != null) {
+            if (poltrona.getCodigo().trim().isEmpty()) {
+                throw new ValidationException("Código da poltrona é obrigatório", "codigo");
+            }
+            existente.setCodigo(poltrona.getCodigo());
         }
         if (poltrona.getLinha() != null) {
-            p.setLinha(poltrona.getLinha());
+            existente.setLinha(poltrona.getLinha());
         }
         if (poltrona.getColuna() != null) {
-            p.setColuna(poltrona.getColuna());
+            existente.setColuna(poltrona.getColuna());
         }
         if (poltrona.getDisponibilidade() != null) {
-            p.setDisponibilidade(poltrona.getDisponibilidade());
+            existente.setDisponibilidade(poltrona.getDisponibilidade());
         }
     }
 }

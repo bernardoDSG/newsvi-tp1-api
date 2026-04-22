@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Sala;
 import br.unitins.repository.SalaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,10 +20,10 @@ public class SalaServiceImpl implements SalaService {
     @Transactional
     public Sala create(Sala sala) {
         if (sala.getNumero() == null) {
-            throw new IllegalArgumentException("Número da sala é obrigatório");
+            throw new ValidationException("Número da sala é obrigatório", "numero");
         }
         if (sala.getCapacidade() == null || sala.getCapacidade() <= 0) {
-            throw new IllegalArgumentException("Capacidade deve ser maior que zero");
+            throw new ValidationException("Capacidade deve ser maior que zero", "capacidade");
         }
         repository.persist(sala);
         return sala;
@@ -55,7 +56,7 @@ public class SalaServiceImpl implements SalaService {
         }
         return sala;
     }
-    
+
     @Override
     public Sala findByNumero(Integer numero) {
         if (numero == null) {
@@ -74,16 +75,19 @@ public class SalaServiceImpl implements SalaService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Sala s = findById(id);
-        
+        Sala existente = findById(id);
+
         if (sala.getNumero() != null) {
-            s.setNumero(sala.getNumero());
+            existente.setNumero(sala.getNumero());
         }
-        if (sala.getCapacidade() != null && sala.getCapacidade() > 0) {
-            s.setCapacidade(sala.getCapacidade());
+        if (sala.getCapacidade() != null) {
+            if (sala.getCapacidade() <= 0) {
+                throw new ValidationException("Capacidade deve ser maior que zero", "capacidade");
+            }
+            existente.setCapacidade(sala.getCapacidade());
         }
         if (sala.getPoltronas() != null) {
-            s.setPoltronas(sala.getPoltronas());
+            existente.setPoltronas(sala.getPoltronas());
         }
     }
 }

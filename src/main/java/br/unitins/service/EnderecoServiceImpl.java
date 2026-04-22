@@ -2,6 +2,7 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Endereco;
 import br.unitins.repository.EnderecoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +20,7 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Transactional
     public Endereco create(Endereco endereco) {
         if (endereco.getLogradouro() == null || endereco.getLogradouro().trim().isEmpty()) {
-            throw new IllegalArgumentException("Logradouro é obrigatório");
+            throw new ValidationException("Logradouro é obrigatório", "logradouro");
         }
         repository.persist(endereco);
         return endereco;
@@ -71,28 +72,31 @@ public class EnderecoServiceImpl implements EnderecoService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Endereco e = findById(id);
-        
+        Endereco existente = findById(id);
+
         if (endereco.getLogradouro() != null) {
-            e.setLogradouro(endereco.getLogradouro());
+            if (endereco.getLogradouro().trim().isEmpty()) {
+                throw new ValidationException("Logradouro é obrigatório", "logradouro");
+            }
+            existente.setLogradouro(endereco.getLogradouro());
         }
         if (endereco.getNumero() != null) {
-            e.setNumero(endereco.getNumero());
+            existente.setNumero(endereco.getNumero());
         }
         if (endereco.getComplemento() != null) {
-            e.setComplemento(endereco.getComplemento());
+            existente.setComplemento(endereco.getComplemento());
         }
         if (endereco.getBairro() != null) {
-            e.setBairro(endereco.getBairro());
+            existente.setBairro(endereco.getBairro());
         }
         if (endereco.getCidade() != null) {
-            e.setCidade(endereco.getCidade());
+            existente.setCidade(endereco.getCidade());
         }
         if (endereco.getEstado() != null) {
-            e.setEstado(endereco.getEstado());
+            existente.setEstado(endereco.getEstado());
         }
         if (endereco.getCep() != null) {
-            e.setCep(endereco.getCep());
+            existente.setCep(endereco.getCep());
         }
     }
 }

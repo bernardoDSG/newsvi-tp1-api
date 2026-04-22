@@ -4,7 +4,12 @@ import java.util.List;
 
 import br.unitins.dto.SessaoRequestDTO;
 import br.unitins.dto.SessaoResponseDTO;
+import br.unitins.exception.ConflictException;
+import br.unitins.exception.ValidationException;
 import br.unitins.mapper.SessaoMapper;
+import br.unitins.model.Cinema;
+import br.unitins.model.Filme;
+import br.unitins.model.Sala;
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
 import br.unitins.model.TipoSessao;
@@ -30,7 +35,7 @@ import jakarta.ws.rs.core.Response.Status;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SessaoResource {
-    
+
     @Inject
     SessaoService service;
 
@@ -39,235 +44,146 @@ public class SessaoResource {
 
     @Inject
     SalaRepository salaRepository;
-    
+
     @Inject
     CinemaRepository cinemaRepository;
 
     @GET
     public Response buscarTodos() {
-        List<SessaoResponseDTO> list = service.findAll().stream()
-            .map(SessaoMapper::toResponseDTO)
-            .toList();
+        List<SessaoResponseDTO> list = service.findAll().stream().map(SessaoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
-        Sessao sessao = service.findById(id);
-        return Response.ok(SessaoMapper.toResponseDTO(sessao)).build();
+        return Response.ok(SessaoMapper.toResponseDTO(service.findById(id))).build();
     }
-    
+
     @GET
     @Path("/filme/{filmeId}")
     public Response buscarPorFilme(@PathParam("filmeId") Long filmeId) {
-        List<SessaoResponseDTO> list = service.findByFilme(filmeId).stream()
-            .map(SessaoMapper::toResponseDTO)
-            .toList();
+        List<SessaoResponseDTO> list = service.findByFilme(filmeId).stream().map(SessaoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
-    
+
     @GET
     @Path("/cinema/{cinemaId}")
     public Response buscarPorCinema(@PathParam("cinemaId") Long cinemaId) {
-        List<SessaoResponseDTO> list = service.findByCinema(cinemaId).stream()
-            .map(SessaoMapper::toResponseDTO)
-            .toList();
+        List<SessaoResponseDTO> list = service.findByCinema(cinemaId).stream().map(SessaoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
-    
+
     @GET
     @Path("/status/{statusId}")
     public Response buscarPorStatus(@PathParam("statusId") Long statusId) {
-        List<SessaoResponseDTO> list = service.findByStatus(statusId).stream()
-            .map(SessaoMapper::toResponseDTO)
-            .toList();
+        List<SessaoResponseDTO> list = service.findByStatus(statusId).stream().map(SessaoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
-    
+
     @GET
     @Path("/em-exibicao")
     public Response buscarSessoesEmExibicao() {
-        List<SessaoResponseDTO> list = service.findSessoesEmExibicao(null).stream()
-            .map(SessaoMapper::toResponseDTO)
-            .toList();
+        List<SessaoResponseDTO> list = service.findSessoesEmExibicao(null).stream().map(SessaoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @POST
     public Response criar(@Valid SessaoRequestDTO dto) {
-        try {
-            Sessao sessao = SessaoMapper.toEntity(dto);
-            
-            if (dto.filmeId() != null) {
-                var filme = filmeRepository.findById(dto.filmeId());
-                if (filme == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Filme não encontrado com ID: " + dto.filmeId())
-                        .build();
-                }
-                sessao.setFilme(filme);
-            }
-            
-            if (dto.cinemaId() != null) {
-                var cinema = cinemaRepository.findById(dto.cinemaId());
-                if (cinema == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
-                        .build();
-                }
-                sessao.setCinema(cinema);
-            }
-            
-            if (dto.tipoSessaoId() != null) {
-                TipoSessao tipo = TipoSessao.valueOf(dto.tipoSessaoId());
-                if (tipo == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Tipo de sessão inválido")
-                        .build();
-                }
-                sessao.setTipo(tipo);
-            }
-            
-            if (dto.statusId() != null) {
-                StatusSessao status = StatusSessao.valueOf(dto.statusId());
-                if (status == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Status de sessão inválido")
-                        .build();
-                }
-                sessao.setStatus(status);
-            }
-            
-            if (dto.salasIds() != null && !dto.salasIds().isEmpty()) {
-                sessao.setSalas(dto.salasIds().stream()
-                    .map(id -> salaRepository.findById(id))
-                    .filter(s -> s != null)
-                    .toList());
-            }
-            
-            if (sessao.getInicio().isAfter(sessao.getFim())) {
-                return Response.status(Status.BAD_REQUEST)
-                    .entity("Horário de início não pode ser após o horário de fim")
-                    .build();
-            }
-            
-            // Verificar conflito de horário
-            for (var sala : sessao.getSalas()) {
-                if (service.existsBySalaAndHorario(sala.getId(), sessao.getInicio(), sessao.getFim(), null)) {
-                    return Response.status(Status.CONFLICT)
-                        .entity("Conflito de horário na sala " + sala.getNumero())
-                        .build();
-                }
-            }
-            
-            service.create(sessao);
-            return Response.status(Status.CREATED)
-                .entity(SessaoMapper.toResponseDTO(sessao))
-                .build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao criar sessão: " + e.getMessage())
-                .build();
-        }
+        Sessao sessao = SessaoMapper.toEntity(dto);
+        sessao.setFilme(loadFilme(dto.filmeId()));
+        sessao.setCinema(loadCinema(dto.cinemaId()));
+        sessao.setTipo(loadTipo(dto.tipoSessaoId()));
+        sessao.setStatus(loadStatus(dto.statusId()));
+        sessao.setSalas(loadSalas(dto.salasIds()));
+
+        validarConflitoHorario(sessao, null);
+
+        Sessao criada = service.create(sessao);
+        return Response.status(Status.CREATED).entity(SessaoMapper.toResponseDTO(criada)).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response alterar(@PathParam("id") Long id, @Valid SessaoRequestDTO dto) {
-        try {
-            Sessao existing = service.findById(id);
-            if (existing == null) {
-                return Response.status(Status.NOT_FOUND)
-                    .entity("Sessão não encontrada com ID: " + id)
-                    .build();
-            }
-            
-            Sessao sessao = SessaoMapper.toEntity(dto);
-            sessao.setId(id);
-            
-            if (dto.filmeId() != null) {
-                var filme = filmeRepository.findById(dto.filmeId());
-                if (filme == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Filme não encontrado com ID: " + dto.filmeId())
-                        .build();
-                }
-                sessao.setFilme(filme);
-            }
-            
-            if (dto.cinemaId() != null) {
-                var cinema = cinemaRepository.findById(dto.cinemaId());
-                if (cinema == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Cinema não encontrado com ID: " + dto.cinemaId())
-                        .build();
-                }
-                sessao.setCinema(cinema);
-            }
-            
-            if (dto.tipoSessaoId() != null) {
-                TipoSessao tipo = TipoSessao.valueOf(dto.tipoSessaoId());
-                if (tipo == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Tipo de sessão inválido")
-                        .build();
-                }
-                sessao.setTipo(tipo);
-            }
-            
-            if (dto.statusId() != null) {
-                StatusSessao status = StatusSessao.valueOf(dto.statusId());
-                if (status == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                        .entity("Status de sessão inválido")
-                        .build();
-                }
-                sessao.setStatus(status);
-            }
-            
-            if (dto.salasIds() != null) {
-                sessao.setSalas(dto.salasIds().stream()
-                    .map(salaId -> salaRepository.findById(salaId))
-                    .filter(s -> s != null)
-                    .toList());
-            }
-            
-            if (sessao.getInicio() != null && sessao.getFim() != null && 
-                sessao.getInicio().isAfter(sessao.getFim())) {
-                return Response.status(Status.BAD_REQUEST)
-                    .entity("Horário de início não pode ser após o horário de fim")
-                    .build();
-            }
-            
-            // Verificar conflito de horário (excluindo a própria sessão)
-            for (var sala : sessao.getSalas()) {
-                if (service.existsBySalaAndHorario(sala.getId(), sessao.getInicio(), sessao.getFim(), id)) {
-                    return Response.status(Status.CONFLICT)
-                        .entity("Conflito de horário na sala " + sala.getNumero())
-                        .build();
-                }
-            }
-            
-            service.update(id, sessao);
-            return Response.ok(SessaoMapper.toResponseDTO(sessao)).build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                .entity("Erro ao atualizar sessão: " + e.getMessage())
-                .build();
+        Sessao sessao = SessaoMapper.toEntity(dto);
+        sessao.setId(id);
+        sessao.setFilme(loadFilme(dto.filmeId()));
+        sessao.setCinema(loadCinema(dto.cinemaId()));
+        sessao.setTipo(loadTipo(dto.tipoSessaoId()));
+        sessao.setStatus(loadStatus(dto.statusId()));
+        if (dto.salasIds() != null) {
+            sessao.setSalas(loadSalas(dto.salasIds()));
         }
+
+        validarConflitoHorario(sessao, id);
+
+        service.update(id, sessao);
+        return Response.ok(SessaoMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response deletarPorId(@PathParam("id") Long id) {
-        Sessao sessao = service.findById(id);
-        if (sessao == null) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Sessão não encontrada com ID: " + id)
-                .build();
-        }
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();
+    }
+
+    private Filme loadFilme(Long filmeId) {
+        Filme filme = filmeRepository.findById(filmeId);
+        if (filme == null) {
+            throw new ValidationException("Filme informado não existe: " + filmeId, "filmeId");
+        }
+        return filme;
+    }
+
+    private Cinema loadCinema(Long cinemaId) {
+        Cinema cinema = cinemaRepository.findById(cinemaId);
+        if (cinema == null) {
+            throw new ValidationException("Cinema informado não existe: " + cinemaId, "cinemaId");
+        }
+        return cinema;
+    }
+
+    private TipoSessao loadTipo(Long tipoSessaoId) {
+        TipoSessao tipo = TipoSessao.valueOf(tipoSessaoId);
+        if (tipo == null) {
+            throw new ValidationException("Tipo de sessão inválido", "tipoSessaoId");
+        }
+        return tipo;
+    }
+
+    private StatusSessao loadStatus(Long statusId) {
+        StatusSessao status = StatusSessao.valueOf(statusId);
+        if (status == null) {
+            throw new ValidationException("Status de sessão inválido", "statusId");
+        }
+        return status;
+    }
+
+    private List<Sala> loadSalas(List<Long> salasIds) {
+        if (salasIds == null) {
+            return null;
+        }
+        return salasIds.stream().map(this::loadSala).toList();
+    }
+
+    private Sala loadSala(Long salaId) {
+        Sala sala = salaRepository.findById(salaId);
+        if (sala == null) {
+            throw new ValidationException("Sala informada não existe: " + salaId, "salasIds");
+        }
+        return sala;
+    }
+
+    private void validarConflitoHorario(Sessao sessao, Long sessaoId) {
+        if (sessao.getSalas() == null) {
+            return;
+        }
+        for (Sala sala : sessao.getSalas()) {
+            if (service.existsBySalaAndHorario(sala.getId(), sessao.getInicio(), sessao.getFim(), sessaoId)) {
+                throw new ConflictException("Conflito de horário na sala " + sala.getNumero());
+            }
+        }
     }
 }

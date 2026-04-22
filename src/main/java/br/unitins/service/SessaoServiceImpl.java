@@ -3,6 +3,7 @@ package br.unitins.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import br.unitins.exception.ValidationException;
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
 import br.unitins.repository.SessaoRepository;
@@ -20,26 +21,7 @@ public class SessaoServiceImpl implements SessaoService {
     @Override
     @Transactional
     public Sessao create(Sessao sessao) {
-        if (sessao.getInicio() == null) {
-            throw new IllegalArgumentException("Horário de início é obrigatório");
-        }
-        if (sessao.getFim() == null) {
-            throw new IllegalArgumentException("Horário de fim é obrigatório");
-        }
-        if (sessao.getInicio().isAfter(sessao.getFim())) {
-            throw new IllegalArgumentException("Horário de início não pode ser após o horário de fim");
-        }
-        if (sessao.getFilme() == null) {
-            throw new IllegalArgumentException("Filme é obrigatório");
-        }
-        if (sessao.getTipo() == null) {
-            throw new IllegalArgumentException("Tipo de sessão é obrigatório");
-        }
-        if (sessao.getCapacidadeTotal() == null || sessao.getCapacidadeTotal() <= 0) {
-            throw new IllegalArgumentException("Capacidade total deve ser maior que zero");
-        }
-
-        // REMOVIDA: validação de preco
+        validateSessao(sessao);
 
         if (sessao.getStatus() == null) {
             sessao.setStatus(StatusSessao.EM_BREVE);
@@ -128,39 +110,64 @@ public class SessaoServiceImpl implements SessaoService {
         if (id == null) {
             throw new IllegalArgumentException("ID não pode ser nulo");
         }
-        Sessao s = findById(id);
+        Sessao existente = findById(id);
 
         if (sessao.getInicio() != null) {
-            s.setInicio(sessao.getInicio());
+            existente.setInicio(sessao.getInicio());
         }
         if (sessao.getFim() != null) {
-            s.setFim(sessao.getFim());
+            existente.setFim(sessao.getFim());
         }
         if (sessao.getFilme() != null) {
-            s.setFilme(sessao.getFilme());
+            existente.setFilme(sessao.getFilme());
         }
         if (sessao.getTipo() != null) {
-            s.setTipo(sessao.getTipo());
+            existente.setTipo(sessao.getTipo());
         }
         if (sessao.getSalas() != null) {
-            s.setSalas(sessao.getSalas());
+            existente.setSalas(sessao.getSalas());
         }
-        
-        if (sessao.getCapacidadeTotal() != null && sessao.getCapacidadeTotal() > 0) {
-            s.setCapacidadeTotal(sessao.getCapacidadeTotal());
+        if (sessao.getCapacidadeTotal() != null) {
+            if (sessao.getCapacidadeTotal() <= 0) {
+                throw new ValidationException("Capacidade total deve ser maior que zero", "capacidadeTotal");
+            }
+            existente.setCapacidadeTotal(sessao.getCapacidadeTotal());
         }
         if (sessao.getCapacidadeDisponivel() != null) {
-            s.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel());
+            existente.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel());
         }
         if (sessao.getStatus() != null) {
-            s.setStatus(sessao.getStatus());
+            existente.setStatus(sessao.getStatus());
         }
         if (sessao.getCinema() != null) {
-            s.setCinema(sessao.getCinema());
+            existente.setCinema(sessao.getCinema());
         }
 
-        if (s.getInicio() != null && s.getFim() != null && s.getInicio().isAfter(s.getFim())) {
-            throw new IllegalArgumentException("Horário de início não pode ser após o horário de fim");
+        validateIntervalo(existente.getInicio(), existente.getFim());
+    }
+
+    private void validateSessao(Sessao sessao) {
+        if (sessao.getInicio() == null) {
+            throw new ValidationException("Horário de início é obrigatório", "inicio");
+        }
+        if (sessao.getFim() == null) {
+            throw new ValidationException("Horário de fim é obrigatório", "fim");
+        }
+        validateIntervalo(sessao.getInicio(), sessao.getFim());
+        if (sessao.getFilme() == null) {
+            throw new ValidationException("Filme é obrigatório", "filmeId");
+        }
+        if (sessao.getTipo() == null) {
+            throw new ValidationException("Tipo de sessão é obrigatório", "tipoSessaoId");
+        }
+        if (sessao.getCapacidadeTotal() == null || sessao.getCapacidadeTotal() <= 0) {
+            throw new ValidationException("Capacidade total deve ser maior que zero", "capacidadeTotal");
+        }
+    }
+
+    private void validateIntervalo(LocalDateTime inicio, LocalDateTime fim) {
+        if (inicio != null && fim != null && inicio.isAfter(fim)) {
+            throw new ValidationException("Horário de início não pode ser após o horário de fim", "inicio");
         }
     }
 }

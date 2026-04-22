@@ -1,12 +1,18 @@
 package br.unitins.resource;
 
+import java.time.Year;
 import java.util.List;
 
 import br.unitins.dto.FilmeRequestDTO;
 import br.unitins.dto.FilmeResponseDTO;
+import br.unitins.exception.ValidationException;
 import br.unitins.mapper.FilmeMapper;
+import br.unitins.model.Ator;
 import br.unitins.model.ClassificacaoIndicativa;
+import br.unitins.model.Diretor;
 import br.unitins.model.Filme;
+import br.unitins.model.Genero;
+import br.unitins.model.Premio;
 import br.unitins.repository.AtorRepository;
 import br.unitins.repository.DiretorRepository;
 import br.unitins.repository.GeneroRepository;
@@ -44,260 +50,183 @@ public class FilmeResource {
 
     @Inject
     PremioRepository premioRepository;
-    
+
     @Inject
     DiretorRepository diretorRepository;
 
     @GET
     public Response buscarTodos() {
-        List<FilmeResponseDTO> list = service.findAll().stream()
-            .map(FilmeMapper::toResponseDTO)
-            .toList();
+        List<FilmeResponseDTO> list = service.findAll().stream().map(FilmeMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
-        Filme filme = service.findById(id);
-        return Response.ok(FilmeMapper.toResponseDTO(filme)).build();
+        return Response.ok(FilmeMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @GET
     @Path("/find/{nome}")
     public Response buscarPeloNome(@PathParam("nome") String nome) {
-        List<FilmeResponseDTO> list = service.findByNome(nome).stream()
-            .map(FilmeMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhum filme encontrado com nome: " + nome)
-                .build();
-        }
+        List<FilmeResponseDTO> list = service.findByNome(nome).stream().map(FilmeMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/genero/{genero}")
     public Response buscarPorGenero(@PathParam("genero") String genero) {
-        List<FilmeResponseDTO> list = service.findByGenero(genero).stream()
-            .map(FilmeMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhum filme encontrado para o gênero: " + genero)
-                .build();
-        }
+        List<FilmeResponseDTO> list = service.findByGenero(genero).stream().map(FilmeMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/ator/{ator}")
     public Response buscarPorAtor(@PathParam("ator") String ator) {
-        List<FilmeResponseDTO> list = service.findByAtor(ator).stream()
-            .map(FilmeMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhum filme encontrado para o ator: " + ator)
-                .build();
-        }
+        List<FilmeResponseDTO> list = service.findByAtor(ator).stream().map(FilmeMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
-    
+
     @GET
     @Path("/diretor/{diretorId}")
     public Response buscarPorDiretor(@PathParam("diretorId") Long diretorId) {
-        List<FilmeResponseDTO> list = service.findByDiretor(diretorId).stream()
-            .map(FilmeMapper::toResponseDTO)
-            .toList();
-        if (list.isEmpty()) {
-            return Response.status(Status.NOT_FOUND)
-                .entity("Nenhum filme encontrado para o diretor com ID: " + diretorId)
-                .build();
-        }
+        List<FilmeResponseDTO> list = service.findByDiretor(diretorId).stream().map(FilmeMapper::toResponseDTO).toList();
         return Response.ok(list).build();
     }
 
     @GET
     @Path("/duracao")
     public Response buscarPorDuracao(
-            @QueryParam("min") @DefaultValue("0") Integer minMinutos,
-            @QueryParam("max") @DefaultValue("1000") Integer maxMinutos) {
+        @QueryParam("min") @DefaultValue("0") Integer minMinutos,
+        @QueryParam("max") @DefaultValue("1000") Integer maxMinutos) {
 
         if (minMinutos < 0 || maxMinutos < 0) {
-            return Response.status(Status.BAD_REQUEST)
-                    .entity("Min e Max devem ser valores positivos")
-                    .build();
+            throw new IllegalArgumentException("Min e Max devem ser valores positivos");
         }
-
         if (minMinutos > maxMinutos) {
-            return Response.status(Status.BAD_REQUEST)
-                    .entity("Min não pode ser maior que Max")
-                    .build();
+            throw new IllegalArgumentException("Min não pode ser maior que Max");
         }
 
         List<FilmeResponseDTO> list = service.findByDuracaoBetween(minMinutos, maxMinutos).stream()
             .map(FilmeMapper::toResponseDTO)
             .toList();
-
         return Response.ok(list).build();
     }
 
     @POST
     public Response criar(@Valid FilmeRequestDTO dto) {
-        try {
-            int anoAtual = java.time.Year.now().getValue();
-            if (dto.anoLancamento() > anoAtual) {
-                return Response.status(Status.BAD_REQUEST)
-                        .entity("Ano de lançamento não pode ser futuro. Ano atual: " + anoAtual)
-                        .build();
-            }
+        validateAnoLancamento(dto.anoLancamento());
 
-            Filme filme = FilmeMapper.toEntity(dto);
-
-            if (dto.classificacaoIndicativaId() != null) {
-                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa.valueOf(dto.classificacaoIndicativaId());
-                if (classificacao == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                            .entity("Classificação indicativa inválida")
-                            .build();
-                }
-                filme.setClassificacaoIndicativa(classificacao);
-            }
-            
-            if (dto.diretorId() != null) {
-                var diretor = diretorRepository.findById(dto.diretorId());
-                if (diretor == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                            .entity("Diretor não encontrado com ID: " + dto.diretorId())
-                            .build();
-                }
-                filme.setDiretor(diretor);
-            }
-
-            if (dto.generosIds() != null && !dto.generosIds().isEmpty()) {
-                filme.setGeneros(dto.generosIds().stream()
-                        .map(id -> generoRepository.findById(id))
-                        .filter(g -> g != null)
-                        .toList());
-            }
-
-            if (dto.atoresIds() != null && !dto.atoresIds().isEmpty()) {
-                filme.setAtores(dto.atoresIds().stream()
-                        .map(id -> atorRepository.findById(id))
-                        .filter(a -> a != null)
-                        .toList());
-            }
-
-            if (dto.premiosIds() != null && !dto.premiosIds().isEmpty()) {
-                filme.setPremios(dto.premiosIds().stream()
-                        .map(id -> premioRepository.findById(id))
-                        .filter(p -> p != null)
-                        .toList());
-            }
-
-            service.create(filme);
-            return Response.status(Status.CREATED)
-                .entity(FilmeMapper.toResponseDTO(filme))
-                .build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao criar filme: " + e.getMessage())
-                    .build();
+        Filme filme = FilmeMapper.toEntity(dto);
+        filme.setClassificacaoIndicativa(loadClassificacao(dto.classificacaoIndicativaId()));
+        if (dto.diretorId() != null) {
+            filme.setDiretor(loadDiretor(dto.diretorId()));
         }
+        filme.setGeneros(loadGeneros(dto.generosIds()));
+        filme.setAtores(loadAtores(dto.atoresIds()));
+        filme.setPremios(loadPremios(dto.premiosIds()));
+
+        Filme criado = service.create(filme);
+        return Response.status(Status.CREATED).entity(FilmeMapper.toResponseDTO(criado)).build();
     }
 
     @PUT
     @Path("/{id}")
     public Response alterar(@PathParam("id") Long id, @Valid FilmeRequestDTO dto) {
-        try {
-            Filme existing = service.findById(id);
-            if (existing == null) {
-                return Response.status(Status.NOT_FOUND)
-                        .entity("Filme não encontrado com ID: " + id)
-                        .build();
-            }
+        validateAnoLancamento(dto.anoLancamento());
 
-            int anoAtual = java.time.Year.now().getValue();
-            if (dto.anoLancamento() > anoAtual) {
-                return Response.status(Status.BAD_REQUEST)
-                        .entity("Ano de lançamento não pode ser futuro. Ano atual: " + anoAtual)
-                        .build();
-            }
-
-            Filme filme = FilmeMapper.toEntity(dto);
-            filme.setId(id);
-
-            if (dto.classificacaoIndicativaId() != null) {
-                ClassificacaoIndicativa classificacao = ClassificacaoIndicativa.valueOf(dto.classificacaoIndicativaId());
-                if (classificacao == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                            .entity("Classificação indicativa inválida")
-                            .build();
-                }
-                filme.setClassificacaoIndicativa(classificacao);
-            }
-            
-            if (dto.diretorId() != null) {
-                var diretor = diretorRepository.findById(dto.diretorId());
-                if (diretor == null) {
-                    return Response.status(Status.BAD_REQUEST)
-                            .entity("Diretor não encontrado com ID: " + dto.diretorId())
-                            .build();
-                }
-                filme.setDiretor(diretor);
-            }
-
-            if (dto.generosIds() != null) {
-                filme.setGeneros(dto.generosIds().stream()
-                        .map(generoId -> generoRepository.findById(generoId))
-                        .filter(g -> g != null)
-                        .toList());
-            }
-
-            if (dto.atoresIds() != null) {
-                filme.setAtores(dto.atoresIds().stream()
-                        .map(atorId -> atorRepository.findById(atorId))
-                        .filter(a -> a != null)
-                        .toList());
-            }
-
-            if (dto.premiosIds() != null) {
-                filme.setPremios(dto.premiosIds().stream()
-                        .map(premioId -> premioRepository.findById(premioId))
-                        .filter(p -> p != null)
-                        .toList());
-            }
-
-            service.update(id, filme);
-            Filme filmeAtualizado = service.findById(id);
-            return Response.ok(FilmeMapper.toResponseDTO(filmeAtualizado)).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        } catch (Exception e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao atualizar filme: " + e.getMessage())
-                    .build();
+        Filme filme = FilmeMapper.toEntity(dto);
+        filme.setId(id);
+        filme.setClassificacaoIndicativa(loadClassificacao(dto.classificacaoIndicativaId()));
+        if (dto.diretorId() != null) {
+            filme.setDiretor(loadDiretor(dto.diretorId()));
         }
+        if (dto.generosIds() != null) {
+            filme.setGeneros(loadGeneros(dto.generosIds()));
+        }
+        if (dto.atoresIds() != null) {
+            filme.setAtores(loadAtores(dto.atoresIds()));
+        }
+        if (dto.premiosIds() != null) {
+            filme.setPremios(loadPremios(dto.premiosIds()));
+        }
+
+        service.update(id, filme);
+        return Response.ok(FilmeMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response deletarPorId(@PathParam("id") Long id) {
-        Filme filme = service.findById(id);
-        if (filme == null) {
-            return Response.status(Status.NOT_FOUND)
-                    .entity("Filme não encontrado com ID: " + id)
-                    .build();
-        }
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();
+    }
+
+    private void validateAnoLancamento(Integer ano) {
+        int anoAtual = Year.now().getValue();
+        if (ano != null && ano > anoAtual) {
+            throw new ValidationException("Ano de lançamento não pode ser futuro. Ano atual: " + anoAtual, "anoLancamento");
+        }
+    }
+
+    private ClassificacaoIndicativa loadClassificacao(Long classificacaoId) {
+        ClassificacaoIndicativa classificacao = ClassificacaoIndicativa.valueOf(classificacaoId);
+        if (classificacao == null) {
+            throw new ValidationException("Classificação indicativa inválida", "classificacaoIndicativaId");
+        }
+        return classificacao;
+    }
+
+    private Diretor loadDiretor(Long diretorId) {
+        Diretor diretor = diretorRepository.findById(diretorId);
+        if (diretor == null) {
+            throw new ValidationException("Diretor informado não existe: " + diretorId, "diretorId");
+        }
+        return diretor;
+    }
+
+    private List<Genero> loadGeneros(List<Long> generosIds) {
+        if (generosIds == null) {
+            return null;
+        }
+        return generosIds.stream().map(this::loadGenero).toList();
+    }
+
+    private List<Ator> loadAtores(List<Long> atoresIds) {
+        if (atoresIds == null) {
+            return null;
+        }
+        return atoresIds.stream().map(this::loadAtor).toList();
+    }
+
+    private List<Premio> loadPremios(List<Long> premiosIds) {
+        if (premiosIds == null) {
+            return null;
+        }
+        return premiosIds.stream().map(this::loadPremio).toList();
+    }
+
+    private Genero loadGenero(Long generoId) {
+        Genero genero = generoRepository.findById(generoId);
+        if (genero == null) {
+            throw new ValidationException("Gênero informado não existe: " + generoId, "generosIds");
+        }
+        return genero;
+    }
+
+    private Ator loadAtor(Long atorId) {
+        Ator ator = atorRepository.findById(atorId);
+        if (ator == null) {
+            throw new ValidationException("Ator informado não existe: " + atorId, "atoresIds");
+        }
+        return ator;
+    }
+
+    private Premio loadPremio(Long premioId) {
+        Premio premio = premioRepository.findById(premioId);
+        if (premio == null) {
+            throw new ValidationException("Prêmio informado não existe: " + premioId, "premiosIds");
+        }
+        return premio;
     }
 }
