@@ -9,6 +9,7 @@ import br.unitins.mapper.PoltronaMapper;
 import br.unitins.model.Disponibilidade;
 import br.unitins.model.Poltrona;
 import br.unitins.service.PoltronaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -32,6 +33,7 @@ public class PoltronaResource {
     PoltronaService service;
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response buscarTodos() {
         List<PoltronaResponseDTO> list = service.findAll().stream().map(PoltronaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
@@ -39,12 +41,14 @@ public class PoltronaResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorId(@PathParam("id") Long id) {
         return Response.ok(PoltronaMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @GET
     @Path("/find/{codigo}")
+    @RolesAllowed("ADMIN")
     public Response buscarPeloCodigo(@PathParam("codigo") String codigo) {
         List<PoltronaResponseDTO> list = service.findByCodigo(codigo).stream().map(PoltronaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
@@ -52,6 +56,7 @@ public class PoltronaResource {
 
     @GET
     @Path("/disponibilidade/{id}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorDisponibilidade(@PathParam("id") Long disponibilidadeId) {
         List<PoltronaResponseDTO> list = service.findByDisponibilidade(disponibilidadeId).stream()
             .map(PoltronaMapper::toResponseDTO)
@@ -60,6 +65,7 @@ public class PoltronaResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid PoltronaRequestDTO dto) {
         Poltrona poltrona = PoltronaMapper.toEntity(dto);
         poltrona.setDisponibilidade(loadDisponibilidade(dto.disponibilidadeId()));
@@ -69,6 +75,7 @@ public class PoltronaResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid PoltronaRequestDTO dto) {
         Poltrona poltrona = PoltronaMapper.toEntity(dto);
         poltrona.setId(id);
@@ -79,6 +86,7 @@ public class PoltronaResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

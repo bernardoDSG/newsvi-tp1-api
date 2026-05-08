@@ -21,9 +21,11 @@ import br.unitins.model.Genero;
 import br.unitins.service.GeneroService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class GeneroResourceHttpContractTest {
 
     private static final String BASE_URL = "/generos";

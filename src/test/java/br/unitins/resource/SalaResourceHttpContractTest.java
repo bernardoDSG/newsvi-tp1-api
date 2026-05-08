@@ -24,9 +24,11 @@ import br.unitins.repository.PoltronaRepository;
 import br.unitins.service.SalaService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class SalaResourceHttpContractTest {
 
     private static final String BASE_URL = "/salas";

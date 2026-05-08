@@ -18,6 +18,7 @@ import br.unitins.repository.DiretorRepository;
 import br.unitins.repository.GeneroRepository;
 import br.unitins.repository.PremioRepository;
 import br.unitins.service.FilmeService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -114,6 +115,7 @@ public class FilmeResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid FilmeRequestDTO dto) {
         validateAnoLancamento(dto.anoLancamento());
 
@@ -132,6 +134,7 @@ public class FilmeResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid FilmeRequestDTO dto) {
         validateAnoLancamento(dto.anoLancamento());
 
@@ -157,6 +160,7 @@ public class FilmeResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

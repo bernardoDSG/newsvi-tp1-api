@@ -24,10 +24,12 @@ import br.unitins.repository.PremioRepository;
 import br.unitins.service.AtorService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import jakarta.ws.rs.NotFoundException;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class AtorResourceHttpContractTest {
 
     private static final String BASE_URL = "/atores";

@@ -10,6 +10,7 @@ import br.unitins.model.Ator;
 import br.unitins.model.Premio;
 import br.unitins.repository.PremioRepository;
 import br.unitins.service.AtorService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -62,6 +63,7 @@ public class AtorResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid AtorRequestDTO dto) {
         Ator ator = AtorMapper.toEntity(dto);
         ator.setPremios(loadPremios(dto.premiosIds()));
@@ -71,6 +73,7 @@ public class AtorResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid AtorRequestDTO dto) {
         Ator ator = AtorMapper.toEntity(dto);
         ator.setId(id);
@@ -83,6 +86,7 @@ public class AtorResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

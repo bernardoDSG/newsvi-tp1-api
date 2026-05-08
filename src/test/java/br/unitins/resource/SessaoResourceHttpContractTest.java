@@ -32,9 +32,11 @@ import br.unitins.repository.SalaRepository;
 import br.unitins.service.SessaoService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class SessaoResourceHttpContractTest {
 
     private static final String BASE_URL = "/sessoes";

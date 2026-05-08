@@ -7,6 +7,7 @@ import br.unitins.dto.DiretorResponseDTO;
 import br.unitins.mapper.DiretorMapper;
 import br.unitins.model.Diretor;
 import br.unitins.service.DiretorService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -56,6 +57,7 @@ public class DiretorResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid DiretorRequestDTO dto) {
         Diretor criado = service.create(DiretorMapper.toEntity(dto));
         return Response.status(Status.CREATED).entity(DiretorMapper.toResponseDTO(criado)).build();
@@ -63,6 +65,7 @@ public class DiretorResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid DiretorRequestDTO dto) {
         Diretor diretor = DiretorMapper.toEntity(dto);
         diretor.setId(id);
@@ -72,6 +75,7 @@ public class DiretorResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

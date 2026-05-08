@@ -21,9 +21,11 @@ import br.unitins.model.Premio;
 import br.unitins.service.PremioService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class PremioResourceHttpContractTest {
 
     private static final String BASE_URL = "/premios";

@@ -7,6 +7,7 @@ import br.unitins.dto.GeneroResponseDTO;
 import br.unitins.mapper.GeneroMapper;
 import br.unitins.model.Genero;
 import br.unitins.service.GeneroService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -49,6 +50,7 @@ public class GeneroResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid GeneroRequestDTO dto) {
         Genero criado = service.create(GeneroMapper.toEntity(dto));
         return Response.status(Status.CREATED).entity(GeneroMapper.toResponseDTO(criado)).build();
@@ -56,6 +58,7 @@ public class GeneroResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid GeneroRequestDTO dto) {
         Genero genero = GeneroMapper.toEntity(dto);
         genero.setId(id);
@@ -65,6 +68,7 @@ public class GeneroResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

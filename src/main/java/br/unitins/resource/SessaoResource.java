@@ -17,6 +17,7 @@ import br.unitins.repository.CinemaRepository;
 import br.unitins.repository.FilmeRepository;
 import br.unitins.repository.SalaRepository;
 import br.unitins.service.SessaoService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -89,6 +90,7 @@ public class SessaoResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid SessaoRequestDTO dto) {
         Sessao sessao = SessaoMapper.toEntity(dto);
         sessao.setFilme(loadFilme(dto.filmeId()));
@@ -105,6 +107,7 @@ public class SessaoResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid SessaoRequestDTO dto) {
         Sessao sessao = SessaoMapper.toEntity(dto);
         sessao.setId(id);
@@ -124,6 +127,7 @@ public class SessaoResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

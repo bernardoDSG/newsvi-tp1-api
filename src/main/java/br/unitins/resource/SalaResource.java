@@ -10,6 +10,7 @@ import br.unitins.model.Poltrona;
 import br.unitins.model.Sala;
 import br.unitins.repository.PoltronaRepository;
 import br.unitins.service.SalaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -36,6 +37,7 @@ public class SalaResource {
     PoltronaRepository poltronaRepository;
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response buscarTodos() {
         List<SalaResponseDTO> list = service.findAll().stream().map(SalaMapper::toResponseDTO).toList();
         return Response.ok(list).build();
@@ -43,17 +45,20 @@ public class SalaResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorId(@PathParam("id") Long id) {
         return Response.ok(SalaMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @GET
     @Path("/numero/{numero}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorNumero(@PathParam("numero") Integer numero) {
         return Response.ok(SalaMapper.toResponseDTO(service.findByNumero(numero))).build();
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid SalaRequestDTO dto) {
         Sala sala = SalaMapper.toEntity(dto);
         sala.setPoltronas(loadPoltronas(dto.poltronasIds()));
@@ -63,6 +68,7 @@ public class SalaResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid SalaRequestDTO dto) {
         Sala sala = SalaMapper.toEntity(dto);
         sala.setId(id);
@@ -75,6 +81,7 @@ public class SalaResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

@@ -7,6 +7,7 @@ import br.unitins.dto.EnderecoResponseDTO;
 import br.unitins.mapper.EnderecoMapper;
 import br.unitins.model.Endereco;
 import br.unitins.service.EnderecoService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -30,6 +31,7 @@ public class EnderecoResource {
     EnderecoService service;
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response buscarTodos() {
         List<EnderecoResponseDTO> list = service.findAll().stream().map(EnderecoMapper::toResponseDTO).toList();
         return Response.ok(list).build();
@@ -37,17 +39,20 @@ public class EnderecoResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorId(@PathParam("id") Long id) {
         return Response.ok(EnderecoMapper.toResponseDTO(service.findById(id))).build();
     }
 
     @GET
     @Path("/cep/{cep}")
+    @RolesAllowed("ADMIN")
     public Response buscarPorCep(@PathParam("cep") String cep) {
         return Response.ok(EnderecoMapper.toResponseDTO(service.findByCep(cep))).build();
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid EnderecoRequestDTO dto) {
         Endereco criado = service.create(EnderecoMapper.toEntity(dto));
         return Response.status(Status.CREATED).entity(EnderecoMapper.toResponseDTO(criado)).build();
@@ -55,6 +60,7 @@ public class EnderecoResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid EnderecoRequestDTO dto) {
         Endereco endereco = EnderecoMapper.toEntity(dto);
         endereco.setId(id);
@@ -64,6 +70,7 @@ public class EnderecoResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

@@ -9,6 +9,7 @@ import br.unitins.exception.ValidationException;
 import br.unitins.mapper.PremioMapper;
 import br.unitins.model.Premio;
 import br.unitins.service.PremioService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -58,6 +59,7 @@ public class PremioResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid PremioRequestDTO dto) {
         validateAno(dto.ano());
         Premio criado = service.create(PremioMapper.toEntity(dto));
@@ -66,6 +68,7 @@ public class PremioResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid PremioRequestDTO dto) {
         validateAno(dto.ano());
         Premio premio = PremioMapper.toEntity(dto);
@@ -76,6 +79,7 @@ public class PremioResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

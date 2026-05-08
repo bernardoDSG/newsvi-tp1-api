@@ -12,6 +12,7 @@ import br.unitins.model.Sala;
 import br.unitins.repository.EnderecoRepository;
 import br.unitins.repository.SalaRepository;
 import br.unitins.service.CinemaService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -67,6 +68,7 @@ public class CinemaResource {
     }
 
     @POST
+    @RolesAllowed("ADMIN")
     public Response criar(@Valid CinemaRequestDTO dto) {
         Cinema cinema = CinemaMapper.toEntity(dto);
         cinema.setEndereco(loadEndereco(dto.enderecoId()));
@@ -77,6 +79,7 @@ public class CinemaResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response alterar(@PathParam("id") Long id, @Valid CinemaRequestDTO dto) {
         Cinema cinema = CinemaMapper.toEntity(dto);
         cinema.setId(id);
@@ -90,6 +93,7 @@ public class CinemaResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     public Response deletarPorId(@PathParam("id") Long id) {
         service.delete(id);
         return Response.status(Status.NO_CONTENT).build();

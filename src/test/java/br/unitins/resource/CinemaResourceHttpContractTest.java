@@ -25,9 +25,11 @@ import br.unitins.repository.SalaRepository;
 import br.unitins.service.CinemaService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
+@TestSecurity(user = "admin", roles = "ADMIN")
 class CinemaResourceHttpContractTest {
 
     private static final String BASE_URL = "/cinemas";
