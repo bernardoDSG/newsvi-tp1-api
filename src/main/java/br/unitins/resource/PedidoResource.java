@@ -9,6 +9,7 @@ import br.unitins.dto.PedidoResponseDTO;
 import br.unitins.dto.StatusPedidoRequestDTO;
 import br.unitins.mapper.PedidoMapper;
 import br.unitins.service.PedidoService;
+import br.unitins.util.JwtUtil;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -38,7 +39,7 @@ public class PedidoResource {
     @RolesAllowed("CLIENTE")
     public Response criar(@Valid PedidoRequestDTO dto) {
         return Response.status(Status.CREATED)
-                .entity(PedidoMapper.toResponseDTO(service.create(dto, jwt.getName())))
+                .entity(PedidoMapper.toResponseDTO(service.create(dto, JwtUtil.getLogin(jwt))))
                 .build();
     }
 
@@ -60,7 +61,8 @@ public class PedidoResource {
     @Path("/meus")
     @RolesAllowed("CLIENTE")
     public Response meusPedidos() {
-        List<PedidoResponseDTO> list = service.findMeusPedidos(jwt.getName()).stream()
+        String login = JwtUtil.getLogin(jwt);
+        List<PedidoResponseDTO> list = service.findMeusPedidos(login).stream()
                 .map(PedidoMapper::toResponseDTO)
                 .toList();
         return Response.ok(list).build();
@@ -70,7 +72,8 @@ public class PedidoResource {
     @Path("/meus/{id}")
     @RolesAllowed("CLIENTE")
     public Response meuPedidoPorId(@PathParam("id") Long id) {
-        return Response.ok(PedidoMapper.toResponseDTO(service.findMeuPedidoById(id, jwt.getName()))).build();
+        String login = JwtUtil.getLogin(jwt);
+        return Response.ok(PedidoMapper.toResponseDTO(service.findMeuPedidoById(id, login))).build();
     }
 
     @PUT
@@ -85,7 +88,8 @@ public class PedidoResource {
     @Path("/meus/{id}/cancelar")
     @RolesAllowed("CLIENTE")
     public Response cancelarMeuPedido(@PathParam("id") Long id) {
-        service.cancelarMeuPedido(id, jwt.getName());
-        return Response.ok(PedidoMapper.toResponseDTO(service.findMeuPedidoById(id, jwt.getName()))).build();
+        String login = JwtUtil.getLogin(jwt);
+        service.cancelarMeuPedido(id, login);
+        return Response.ok(PedidoMapper.toResponseDTO(service.findMeuPedidoById(id, login))).build();
     }
 }

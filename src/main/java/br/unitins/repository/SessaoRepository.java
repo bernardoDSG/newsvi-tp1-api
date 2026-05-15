@@ -27,6 +27,14 @@ public class SessaoRepository implements PanacheRepository<Sessao> {
         return find("inicio <= ?1 AND fim >= ?1 AND status = ?2", agora, StatusSessao.EM_EXIBICAO);
     }
     
+    public PanacheQuery<Sessao> findByFilmeNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return findAll();
+        }
+        String filtro = "%" + nome.toLowerCase() + "%";
+        return find("lower(filme.nome) like ?1", filtro);
+    }
+
     public long countConflitoHorario(Long salaId, LocalDateTime inicio, LocalDateTime fim, Long sessaoId) {
         String query = "SELECT COUNT(s) FROM Sessao s JOIN s.salas sala " +
                        "WHERE sala.id = ?1 AND " +
