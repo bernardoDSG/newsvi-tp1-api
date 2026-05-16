@@ -2,11 +2,16 @@ package br.unitins.service;
 
 import java.util.List;
 
+import br.unitins.dto.UsuarioCadastroCompletoRequestDTO;
+import br.unitins.dto.UsuarioCadastroRequestDTO;
 import br.unitins.dto.UsuarioResponseDTO;
 import br.unitins.dto.UsuarioUpdateRequestDTO;
 import br.unitins.exception.ValidationException;
 import br.unitins.mapper.UsuarioMapper;
+import br.unitins.mapper.UsuarioEnderecoMapper;
+import br.unitins.model.Perfil;
 import br.unitins.model.Usuario;
+import br.unitins.model.UsuarioEndereco;
 import br.unitins.repository.UsuarioRepository;
 import br.unitins.repository.UsuarioEnderecoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,6 +27,35 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Inject
     UsuarioEnderecoRepository enderecoRepository;
+
+    @Override
+    @Transactional
+    public UsuarioResponseDTO createCurrent(String login, Perfil perfil, UsuarioCadastroRequestDTO dto) {
+        if (usuarioRepository.findByLogin(login).isPresent()) {
+            throw new ValidationException("Usuario ja cadastrado", "login");
+        }
+
+        Usuario usuario = buildUsuario(login, perfil, dto.nome(), dto.email());
+        usuarioRepository.persist(usuario);
+        return UsuarioMapper.toResponseDTO(usuario);
+    }
+
+    @Override
+    @Transactional
+    public UsuarioResponseDTO createCurrentCompleto(String login, Perfil perfil, UsuarioCadastroCompletoRequestDTO dto) {
+        if (usuarioRepository.findByLogin(login).isPresent()) {
+            throw new ValidationException("Usuario ja cadastrado", "login");
+        }
+
+        Usuario usuario = buildUsuario(login, perfil, dto.nome(), dto.email());
+        usuarioRepository.persist(usuario);
+
+        UsuarioEndereco endereco = UsuarioEnderecoMapper.toEntity(dto.endereco());
+        endereco.setUsuario(usuario);
+        enderecoRepository.persist(endereco);
+
+        return UsuarioMapper.toResponseDTO(usuario);
+    }
 
     @Override
     public UsuarioResponseDTO findCurrent(String login) {
@@ -58,8 +92,20 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     private void validateUniqueEmail(String email) {
-        if (usuarioRepository.findByEmail(email).isPresent()) {
+        if (email != null && usuarioRepository.findByEmail(email).isPresent()) {
             throw new ValidationException("Email ja cadastrado", "email");
         }
+    }
+
+    private Usuario buildUsuario(String login, Perfil perfil, String nome, String email) {
+        validateUniqueEmail(email);
+
+        Usuario usuario = new Usuario();
+        usuario.setLogin(login);
+        usuario.setNome(nome);
+        usuario.setEmail(email);
+        usuario.setPerfil(perfil);
+        usuario.setSenhaHash("KEYCLOAK");
+        return usuario;
     }
 }

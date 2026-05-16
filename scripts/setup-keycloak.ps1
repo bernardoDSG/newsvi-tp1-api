@@ -1,209 +1,314 @@
 # ============================================================
-# SETUP KEYCLOAK - Newsvi API
-# Execute no Terminal 3 (não no Terminal do Quarkus/Keycloak)
+# SETUP KEYCLOAK 26.6.1 - Newsvi API
+# Execute depois do Keycloak estar rodando em http://localhost:8180
 # ============================================================
 
-Write-Host "1. Obtendo token admin..." -ForegroundColor Green
+$ErrorActionPreference = "Stop"
 
-$ADMIN_TOKEN = curl -s -X POST "http://localhost:8180/realms/master/protocol/openid-connect/token" `
-  -H "Content-Type: application/x-www-form-urlencoded" `
-  -d "username=admin" `
-  -d "password=admin" `
-  -d "grant_type=password" `
-  -d "client_id=admin-cli" | ConvertFrom-Json | Select-Object -ExpandProperty access_token
+$KeycloakUrl = "http://localhost:8180"
+$AdminUser = "admin"
+$AdminPass = "admin"
 
-Write-Host "Token obtido: $($ADMIN_TOKEN.Substring(0, 20))..." -ForegroundColor Cyan
+$Realm = "newsvi"
+$ClientId = "newsvi-api"
 
-# ============================================================
-# 2. CRIAR REALM
-# ============================================================
-Write-Host "`n2. Criando realm 'newsvi'..." -ForegroundColor Green
+$ClienteUser = "cliente@teste.com"
+$ClientePass = "SenhaForte123!"
 
-curl -s -X POST "http://localhost:8180/admin/realms" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"realm":"newsvi","enabled":true}' | Out-Null
+$AdminAppUser = "admin@teste.com"
+$AdminAppPass = "AdminForte123!"
 
-Write-Host "✓ Realm criado" -ForegroundColor Cyan
+function Get-JsonHeaders {
+  param([Parameter(Mandatory = $true)][string]$Token)
 
-# ============================================================
-# 3. CRIAR ROLES
-# ============================================================
-Write-Host "`n3. Criando roles..." -ForegroundColor Green
+  return @{
+    Authorization = "Bearer $Token"
+  }
+}
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/roles" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"name":"CLIENTE"}' | Out-Null
+function Invoke-Keycloak {
+  param(
+    [Parameter(Mandatory = $true)][string]$Method,
+    [Parameter(Mandatory = $true)][string]$Uri,
+    [string]$Token,
+    [object]$Body
+  )
 
-Write-Host "✓ Role CLIENTE criada" -ForegroundColor Cyan
+  $params = @{
+    Method = $Method
+    Uri = $Uri
+  }
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/roles" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"name":"ADMIN"}' | Out-Null
+  if ($Token) {
+    $params.Headers = Get-JsonHeaders -Token $Token
+  }
 
-Write-Host "✓ Role ADMIN criada" -ForegroundColor Cyan
+  if ($null -ne $Body) {
+    if ($Body -is [string]) {
+      $params.Body = $Body
+    } else {
+      $params.Body = ($Body | ConvertTo-Json -Depth 20)
+    }
 
-# ============================================================
-# 4. CRIAR CLIENTE OIDC
-# ============================================================
-Write-Host "`n4. Criando cliente 'newsvi-api'..." -ForegroundColor Green
+    $params.ContentType = "application/json"
+  }
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/clients" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{
-    "clientId":"newsvi-api",
-    "enabled":true,
-    "publicClient":false,
-    "directAccessGrantsEnabled":true,
-    "serviceAccountsEnabled":true,
-    "protocol":"openid-connect",
-    "redirectUris":["http://localhost:8080/*"],
-    "webOrigins":["http://localhost:8080"]
-  }' | Out-Null
+  return Invoke-RestMethod @params
+}
 
-Write-Host "✓ Cliente criado" -ForegroundColor Cyan
+function Test-KeycloakExists {
+  param(
+    [Parameter(Mandatory = $true)][string]$Uri,
+    [Parameter(Mandatory = $true)][string]$Token
+  )
 
-# ============================================================
-# 5. OBTER CLIENT ID
-# ============================================================
-Write-Host "`n5. Obtendo ID do cliente..." -ForegroundColor Green
+  try {
+    Invoke-Keycloak -Method "GET" -Uri $Uri -Token $Token | Out-Null
+    return $true
+  } catch {
+    if ($_.Exception.Response.StatusCode.value__ -eq 404) {
+      return $false
+    }
 
-$CLIENT_ID = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/clients?clientId=newsvi-api" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json | Select-Object -ExpandProperty id
+    throw
+  }
+}
 
-Write-Host "Client ID: $CLIENT_ID" -ForegroundColor Cyan
+function Find-ByProperty {
+  param(
+    [object]$Items,
+    [Parameter(Mandatory = $true)][string]$Property,
+    [Parameter(Mandatory = $true)][string]$Value
+  )
 
-# ============================================================
-# 6. OBTER CLIENT SECRET
-# ============================================================
-Write-Host "`n6. Obtendo client secret..." -ForegroundColor Green
+  foreach ($Item in $Items) {
+    if ($Item -is [array]) {
+      foreach ($NestedItem in $Item) {
+        if ($NestedItem.$Property -eq $Value) {
+          return $NestedItem
+        }
+      }
+    } elseif ($Item.$Property -eq $Value) {
+      return $Item
+    }
+  }
 
-$CLIENT_SECRET_RESPONSE = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/clients/$CLIENT_ID/client-secret" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json
+  return $null
+}
 
-$CLIENT_SECRET = $CLIENT_SECRET_RESPONSE.value
+Write-Host "Obtendo token admin..." -ForegroundColor Green
 
-Write-Host "✓ Client Secret obtido" -ForegroundColor Cyan
-Write-Host "SECRET: $CLIENT_SECRET" -ForegroundColor Yellow
+$AdminTokenResponse = Invoke-RestMethod `
+  -Method POST `
+  -Uri "$KeycloakUrl/realms/master/protocol/openid-connect/token" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body @{
+    username = $AdminUser
+    password = $AdminPass
+    grant_type = "password"
+    client_id = "admin-cli"
+  }
 
-# ============================================================
-# 7. CRIAR USUÁRIO CLIENTE
-# ============================================================
-Write-Host "`n7. Criando usuário 'cliente@teste.com'..." -ForegroundColor Green
+$AdminToken = $AdminTokenResponse.access_token
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/users" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"username":"cliente@teste.com","email":"cliente@teste.com","enabled":true}' | Out-Null
+if (-not $AdminToken) {
+  Write-Host "Erro: nao consegui obter token admin. Confira usuario/senha e se o Keycloak esta rodando." -ForegroundColor Red
+  exit 1
+}
 
-Write-Host "✓ Usuário cliente criado" -ForegroundColor Cyan
+Write-Host "Token admin obtido." -ForegroundColor Cyan
 
-# ============================================================
-# 8. CRIAR USUÁRIO ADMIN
-# ============================================================
-Write-Host "`n8. Criando usuário 'admin@teste.com'..." -ForegroundColor Green
+Write-Host "Verificando realm '$Realm'..." -ForegroundColor Green
+$RealmExists = Test-KeycloakExists -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/users" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"username":"admin@teste.com","email":"admin@teste.com","enabled":true}' | Out-Null
+if (-not $RealmExists) {
+  Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms" -Token $AdminToken -Body @{
+    realm = $Realm
+    enabled = $true
+  } | Out-Null
 
-Write-Host "✓ Usuário admin criado" -ForegroundColor Cyan
+  Write-Host "Realm criado." -ForegroundColor Cyan
+} else {
+  Write-Host "Realm ja existe." -ForegroundColor Cyan
+}
 
-# ============================================================
-# 9. DEFINIR SENHA DO USUÁRIO CLIENTE
-# ============================================================
-Write-Host "`n9. Definindo senha do usuário cliente..." -ForegroundColor Green
+Write-Host "Configurando tempo de expiracao dos tokens do realm..." -ForegroundColor Green
+$RealmConfig = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken
+$RealmConfig.accessTokenLifespan = 1800
+$RealmConfig.ssoSessionIdleTimeout = 14400
+$RealmConfig.ssoSessionMaxLifespan = 28800
+Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken -Body $RealmConfig | Out-Null
+Write-Host "Access token configurado para 30 minutos." -ForegroundColor Cyan
 
-$USER_CLIENTE = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/users?username=cliente@teste.com" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json | Select-Object -ExpandProperty id
+Write-Host "Criando roles se necessario..." -ForegroundColor Green
 
-curl -s -X PUT "http://localhost:8180/admin/realms/newsvi/users/$USER_CLIENTE/reset-password" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"type":"password","value":"SenhaForte123!","temporary":false}' | Out-Null
+foreach ($RoleName in @("CLIENTE", "ADMIN")) {
+  $RoleExists = Test-KeycloakExists -Uri "$KeycloakUrl/admin/realms/$Realm/roles/$RoleName" -Token $AdminToken
 
-Write-Host "✓ Senha definida: SenhaForte123!" -ForegroundColor Cyan
+  if (-not $RoleExists) {
+    Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/roles" -Token $AdminToken -Body @{
+      name = $RoleName
+    } | Out-Null
 
-# ============================================================
-# 10. DEFINIR SENHA DO USUÁRIO ADMIN
-# ============================================================
-Write-Host "`n10. Definindo senha do usuário admin..." -ForegroundColor Green
+    Write-Host "Role $RoleName criada." -ForegroundColor Cyan
+  } else {
+    Write-Host "Role $RoleName ja existe." -ForegroundColor Cyan
+  }
+}
 
-$USER_ADMIN = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/users?username=admin@teste.com" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json | Select-Object -ExpandProperty id
+Write-Host "Verificando client '$ClientId'..." -ForegroundColor Green
+$AllClients = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/clients" -Token $AdminToken
+$Client = Find-ByProperty -Items $AllClients -Property "clientId" -Value $ClientId
 
-curl -s -X PUT "http://localhost:8180/admin/realms/newsvi/users/$USER_ADMIN/reset-password" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d '{"type":"password","value":"AdminForte123!","temporary":false}' | Out-Null
+$ClientBody = @{
+  clientId = $ClientId
+  enabled = $true
+  publicClient = $false
+  clientAuthenticatorType = "client-secret"
+  directAccessGrantsEnabled = $true
+  serviceAccountsEnabled = $true
+  standardFlowEnabled = $true
+  protocol = "openid-connect"
+  redirectUris = @("http://localhost:8080/*")
+  webOrigins = @("http://localhost:8080")
+}
 
-Write-Host "✓ Senha definida: AdminForte123!" -ForegroundColor Cyan
+if (-not $Client) {
+  Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/clients" -Token $AdminToken -Body $ClientBody | Out-Null
+  Write-Host "Client criado." -ForegroundColor Cyan
+} else {
+  Write-Host "Client ja existe." -ForegroundColor Cyan
+}
 
-# ============================================================
-# 11. ATRIBUIR ROLE CLIENTE AO USUÁRIO CLIENTE
-# ============================================================
-Write-Host "`n11. Atribuindo role CLIENTE..." -ForegroundColor Green
+$AllClients = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/clients" -Token $AdminToken
+$Client = Find-ByProperty -Items $AllClients -Property "clientId" -Value $ClientId
 
-$ROLE_CLIENTE = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/roles/CLIENTE" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json
+if (-not $Client) {
+  Write-Host "Erro: o client '$ClientId' nao foi encontrado depois da criacao." -ForegroundColor Red
+  exit 1
+}
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/users/$USER_CLIENTE/role-mappings/realm" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d "[$($ROLE_CLIENTE | ConvertTo-Json)]" | Out-Null
+$ClientUuid = $Client.id
 
-Write-Host "✓ Role CLIENTE atribuída" -ForegroundColor Cyan
+if (-not $ClientUuid) {
+  Write-Host "Erro: nao consegui obter o UUID do client '$ClientId'." -ForegroundColor Red
+  exit 1
+}
 
-# ============================================================
-# 12. ATRIBUIR ROLE ADMIN AO USUÁRIO ADMIN
-# ============================================================
-Write-Host "`n12. Atribuindo role ADMIN..." -ForegroundColor Green
+Write-Host "Client UUID: $ClientUuid" -ForegroundColor Cyan
 
-$ROLE_ADMIN = curl -s -X GET "http://localhost:8180/admin/realms/newsvi/roles/ADMIN" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" | ConvertFrom-Json
+Write-Host "Verificando audience mapper..." -ForegroundColor Green
+$MapperName = "$ClientId-audience"
+$Mappers = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/clients/$ClientUuid/protocol-mappers/models" -Token $AdminToken
+$MapperExists = Find-ByProperty -Items $Mappers -Property "name" -Value $MapperName
 
-curl -s -X POST "http://localhost:8180/admin/realms/newsvi/users/$USER_ADMIN/role-mappings/realm" `
-  -H "Authorization: Bearer $ADMIN_TOKEN" `
-  -H "Content-Type: application/json" `
-  -d "[$($ROLE_ADMIN | ConvertTo-Json)]" | Out-Null
+if (-not $MapperExists) {
+  Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/clients/$ClientUuid/protocol-mappers/models" -Token $AdminToken -Body @{
+    name = $MapperName
+    protocol = "openid-connect"
+    protocolMapper = "oidc-audience-mapper"
+    config = @{
+      "included.client.audience" = $ClientId
+      "access.token.claim" = "true"
+      "id.token.claim" = "false"
+    }
+  } | Out-Null
 
-Write-Host "✓ Role ADMIN atribuída" -ForegroundColor Cyan
+  Write-Host "Audience mapper criado." -ForegroundColor Cyan
+} else {
+  Write-Host "Audience mapper ja existe." -ForegroundColor Cyan
+}
 
-# ============================================================
-# RESUMO FINAL
-# ============================================================
-Write-Host "`n`n========== SETUP CONCLUÍDO ==========`n" -ForegroundColor Green
+Write-Host "Obtendo client secret..." -ForegroundColor Green
+$ClientSecret = $null
 
-Write-Host "Credenciais para autenticação:" -ForegroundColor Yellow
-Write-Host "
-Usuário 1 (CLIENTE):
-  - Login: cliente@teste.com
-  - Senha: SenhaForte123!
+try {
+  $ClientSecret = (Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/clients/$ClientUuid/client-secret" -Token $AdminToken).value
+} catch {
+  $ClientSecret = $null
+}
 
-Usuário 2 (ADMIN):
-  - Login: admin@teste.com
-  - Senha: AdminForte123!
+if (-not $ClientSecret) {
+  Write-Host "Client secret vazio. Gerando novo secret..." -ForegroundColor Yellow
+  $ClientSecret = (Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/clients/$ClientUuid/client-secret" -Token $AdminToken).value
+}
 
-Cliente OIDC:
-  - ID: newsvi-api
-  - Secret: $CLIENT_SECRET
+if (-not $ClientSecret) {
+  Write-Host "Erro: nao consegui obter o client secret." -ForegroundColor Red
+  Write-Host "No Admin Console, abra Clients > newsvi-api > Settings e confira se Client authentication esta ON." -ForegroundColor Red
+  exit 1
+}
 
-Próximo passo:
-  1. Atualize em application.properties:
-     quarkus.oidc.credentials.secret=$CLIENT_SECRET
-  
-  2. Reinicie o Quarkus (Ctrl+C e execute novamente)
-  
-  3. Obtenha um token com:
-     curl -X POST 'http://localhost:8180/realms/newsvi/protocol/openid-connect/token' \
-       -H 'Content-Type: application/x-www-form-urlencoded' \
-       -d 'client_id=newsvi-api' \
-       -d 'client_secret=$CLIENT_SECRET' \
-       -d 'grant_type=password' \
-       -d 'username=cliente@teste.com' \
-       -d 'password=SenhaForte123!'
-"
+Write-Host "Criando usuarios se necessario..." -ForegroundColor Green
+
+$UsersToCreate = @(
+  @{
+    Username = $ClienteUser
+    Password = $ClientePass
+    FirstName = "Cliente"
+    LastName = "Teste"
+    Role = "CLIENTE"
+  },
+  @{
+    Username = $AdminAppUser
+    Password = $AdminAppPass
+    FirstName = "Admin"
+    LastName = "Teste"
+    Role = "ADMIN"
+  }
+)
+
+foreach ($UserData in $UsersToCreate) {
+  $Username = $UserData.Username
+  $ExistingUsers = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/users?username=$Username" -Token $AdminToken
+  $ExistingUser = Find-ByProperty -Items $ExistingUsers -Property "username" -Value $Username
+
+  if (-not $ExistingUser) {
+    Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/users" -Token $AdminToken -Body @{
+      username = $Username
+      email = $Username
+      firstName = $UserData.FirstName
+      lastName = $UserData.LastName
+      enabled = $true
+      emailVerified = $true
+    } | Out-Null
+
+    Write-Host "Usuario $Username criado." -ForegroundColor Cyan
+    $ExistingUsers = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/users?username=$Username" -Token $AdminToken
+    $ExistingUser = Find-ByProperty -Items $ExistingUsers -Property "username" -Value $Username
+  } else {
+    Write-Host "Usuario $Username ja existe." -ForegroundColor Cyan
+  }
+
+  $UserUuid = $ExistingUser.id
+
+  Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm/users/$UserUuid/reset-password" -Token $AdminToken -Body @{
+    type = "password"
+    value = $UserData.Password
+    temporary = $false
+  } | Out-Null
+
+  $Role = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm/roles/$($UserData.Role)" -Token $AdminToken
+  $RoleMappingJson = "[{`"id`":`"$($Role.id)`",`"name`":`"$($Role.name)`"}]"
+
+  Invoke-Keycloak -Method "POST" -Uri "$KeycloakUrl/admin/realms/$Realm/users/$UserUuid/role-mappings/realm" -Token $AdminToken -Body $RoleMappingJson | Out-Null
+  Write-Host "Senha definida e role $($UserData.Role) atribuida para $Username." -ForegroundColor Cyan
+}
+
+Write-Host ""
+Write-Host "========== SETUP CONCLUIDO ==========" -ForegroundColor Green
+Write-Host ""
+Write-Host "Usuario CLIENTE:"
+Write-Host "  Login: $ClienteUser"
+Write-Host "  Senha: $ClientePass"
+Write-Host ""
+Write-Host "Usuario ADMIN:"
+Write-Host "  Login: $AdminAppUser"
+Write-Host "  Senha: $AdminAppPass"
+Write-Host ""
+Write-Host "Cliente OIDC:"
+Write-Host "  ID: $ClientId"
+Write-Host "  Secret: $ClientSecret" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Atualize em src/main/resources/application.properties:"
+Write-Host "quarkus.oidc.credentials.secret=$ClientSecret" -ForegroundColor Yellow
