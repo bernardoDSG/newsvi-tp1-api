@@ -43,3 +43,17 @@ nb-configuration.xml
 /.quarkus/cli/plugins/
 # TLS Certificates
 .certs/
+
+# Build/test artifacts
+target/
+out/
+**/TEST-*.xml
+**/surefire-reports/
+**/failsafe-reports/
+target/test-classes/
+
+# Quarkus dev/bootstrap
+.quarkus/
+
+# Keys and secrets (do not commit private keys)
+src/main/resources/META-INF/resources/privateKey.pem
