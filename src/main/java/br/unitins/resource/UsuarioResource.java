@@ -8,7 +8,6 @@ import br.unitins.dto.UsuarioEnderecoRequestDTO;
 import br.unitins.dto.UsuarioEnderecoResponseDTO;
 import br.unitins.dto.UsuarioResponseDTO;
 import br.unitins.dto.UsuarioUpdateRequestDTO;
-import br.unitins.dto.UsuarioPasswordChangeRequestDTO;
 import br.unitins.service.UsuarioEnderecoService;
 import br.unitins.service.UsuarioService;
 import br.unitins.util.JwtUtil;
@@ -54,15 +53,6 @@ public class UsuarioResource {
         String login = JwtUtil.getLogin(jwt);
         UsuarioResponseDTO usuario = usuarioService.updateCurrent(login, dto);
         return Response.ok(usuario).build();
-    }
-
-    @PUT
-    @Path("/me/password")
-    @RolesAllowed({"CLIENTE", "ADMIN"})
-    public Response changePassword(@Valid UsuarioPasswordChangeRequestDTO dto) {
-        String login = JwtUtil.getLogin(jwt);
-        usuarioService.changePassword(login, dto);
-        return Response.ok().build();
     }
 
     @GET

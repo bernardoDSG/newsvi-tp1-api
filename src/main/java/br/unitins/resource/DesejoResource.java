@@ -57,11 +57,5 @@ public class DesejoResource {
         return Response.noContent().build();
     }
 
-    private Long parseLongOrNull(String value) {
-        try {
-            return Long.valueOf(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
+    
 }
