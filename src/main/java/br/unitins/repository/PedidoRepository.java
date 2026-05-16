@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import br.unitins.model.Pedido;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -12,3 +12,4 @@ public class PedidoRepository implements PanacheRepository<Pedido> {
         return find("usuario.login", login);
     }
 }
+

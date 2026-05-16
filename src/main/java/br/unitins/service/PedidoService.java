@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import java.util.List;
 
@@ -18,3 +18,4 @@ public interface PedidoService {
     void updateStatus(@NotNull(message = "ID nao pode ser nulo") Long id, StatusPedido status);
     void cancelarMeuPedido(@NotNull(message = "ID nao pode ser nulo") Long id, String loginUsuario);
 }
+

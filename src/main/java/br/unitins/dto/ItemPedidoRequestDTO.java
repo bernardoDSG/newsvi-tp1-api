@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.math.BigDecimal;
 
@@ -26,3 +26,4 @@ public record ItemPedidoRequestDTO(
     @DecimalMin(value = "0.00", message = "Desconto unitario nao pode ser negativo")
     BigDecimal descontoUnitario
 ) {}
+

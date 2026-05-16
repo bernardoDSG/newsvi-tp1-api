@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import java.math.BigDecimal;
 
@@ -73,3 +73,4 @@ public class ItemPedido extends DefaultEntity {
         this.poltrona = poltrona;
     }
 }
+

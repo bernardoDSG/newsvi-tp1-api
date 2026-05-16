@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import java.util.Set;
 
@@ -19,3 +19,4 @@ public class JwtService {
                 .sign();
     }
 }
+

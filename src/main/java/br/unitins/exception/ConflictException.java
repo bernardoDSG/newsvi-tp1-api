@@ -1,4 +1,4 @@
-package br.unitins.exception;
+﻿package br.unitins.exception;
 
 public class ConflictException extends RuntimeException {
 
@@ -8,3 +8,4 @@ public class ConflictException extends RuntimeException {
         super(message);
     }
 }
+

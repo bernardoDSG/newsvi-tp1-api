@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import br.unitins.converter.DisponibilidadeConverter;
 import jakarta.persistence.Convert;

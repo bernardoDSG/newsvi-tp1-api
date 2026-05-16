@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -37,3 +37,4 @@ public class UsuarioEndereco extends DefaultEntity {
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }
+

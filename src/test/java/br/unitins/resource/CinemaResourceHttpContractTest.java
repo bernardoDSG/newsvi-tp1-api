@@ -1,4 +1,4 @@
-package br.unitins.resource;
+﻿package br.unitins.resource;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -214,3 +214,4 @@ class CinemaResourceHttpContractTest {
         return sala;
     }
 }
+

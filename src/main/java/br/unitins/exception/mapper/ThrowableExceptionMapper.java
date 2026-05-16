@@ -1,4 +1,4 @@
-package br.unitins.exception.mapper;
+﻿package br.unitins.exception.mapper;
 
 import br.unitins.exception.ProblemDetail;
 import jakarta.ws.rs.core.Context;
@@ -29,3 +29,4 @@ public class ThrowableExceptionMapper implements ExceptionMapper<Throwable> {
         return Response.status(500).entity(problemDetail).build();
     }
 }
+

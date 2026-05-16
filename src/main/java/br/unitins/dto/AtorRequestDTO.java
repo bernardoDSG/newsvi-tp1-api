@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.time.LocalDate;
 import java.util.List;

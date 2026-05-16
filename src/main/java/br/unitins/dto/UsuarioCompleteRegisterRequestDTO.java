@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,3 +27,4 @@ public record UsuarioCompleteRegisterRequestDTO(
     @NotBlank(message = "CEP e obrigatorio")
     String cep
 ) {}
+

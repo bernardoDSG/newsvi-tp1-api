@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 public record UsuarioEnderecoResponseDTO(
     Long id,
@@ -10,3 +10,4 @@ public record UsuarioEnderecoResponseDTO(
     String estado,
     String cep
 ) {}
+

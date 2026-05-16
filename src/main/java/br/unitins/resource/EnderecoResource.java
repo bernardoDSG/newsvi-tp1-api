@@ -1,4 +1,4 @@
-package br.unitins.resource;
+﻿package br.unitins.resource;
 
 import java.util.List;
 
@@ -76,3 +76,4 @@ public class EnderecoResource {
         return Response.status(Status.NO_CONTENT).build();
     }
 }
+

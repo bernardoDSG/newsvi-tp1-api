@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,3 +13,4 @@ public record PedidoResponseDTO(
     String usuarioLogin,
     List<ItemPedidoResponseDTO> itens
 ) {}
+

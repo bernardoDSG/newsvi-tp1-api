@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -47,3 +47,4 @@ public class HashService {
         return BCrypt.checkpw(valor, hash);
     }
 }
+

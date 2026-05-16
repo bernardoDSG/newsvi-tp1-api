@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import java.util.List;
 
@@ -13,3 +13,4 @@ public class UsuarioEnderecoRepository implements PanacheRepository<UsuarioEnder
         return list("usuario.login", login);
     }
 }
+

@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 public record DesejoResponseDTO(
     Long id,
@@ -8,3 +8,4 @@ public record DesejoResponseDTO(
     Long usuarioId,
     String usuarioLogin
 ) {}
+

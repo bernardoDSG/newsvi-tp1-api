@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,3 +10,4 @@ public record AuthRequestDTO(
     @NotBlank(message = "A senha e obrigatoria")
     String senha
 ) {}
+

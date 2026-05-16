@@ -1,4 +1,4 @@
-package br.unitins.mapper;
+﻿package br.unitins.mapper;
 
 import br.unitins.dto.DesejoResponseDTO;
 import br.unitins.model.Desejo;
@@ -19,3 +19,4 @@ public class DesejoMapper {
         );
     }
 }
+

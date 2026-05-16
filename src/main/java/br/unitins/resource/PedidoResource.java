@@ -1,4 +1,4 @@
-package br.unitins.resource;
+﻿package br.unitins.resource;
 
 import java.util.List;
 
@@ -93,3 +93,4 @@ public class PedidoResource {
         return Response.ok(PedidoMapper.toResponseDTO(service.findMeuPedidoById(id, login))).build();
     }
 }
+

@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -17,3 +17,4 @@ public record UsuarioEnderecoRequestDTO(
     @NotBlank(message = "CEP e obrigatorio")
     String cep
 ) {}
+

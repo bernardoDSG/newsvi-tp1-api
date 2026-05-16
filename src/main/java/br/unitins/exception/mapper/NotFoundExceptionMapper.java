@@ -1,4 +1,4 @@
-package br.unitins.exception.mapper;
+﻿package br.unitins.exception.mapper;
 
 import br.unitins.exception.ProblemDetail;
 import jakarta.ws.rs.NotFoundException;
@@ -30,3 +30,4 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
         return Response.status(404).entity(problemDetail).build();
     }
 }
+

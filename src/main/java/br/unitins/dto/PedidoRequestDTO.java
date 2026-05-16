@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.util.List;
 
@@ -10,3 +10,4 @@ public record PedidoRequestDTO(
     @NotEmpty(message = "Pedido deve possuir ao menos um item")
     List<@Valid ItemPedidoRequestDTO> itens
 ) {}
+

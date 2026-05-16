@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import java.util.List;
 
@@ -13,3 +13,4 @@ public interface DesejoService {
 
     List<DesejoResponseDTO> listByUsuario(String login);
 }
+

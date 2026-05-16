@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.time.LocalDateTime;
 
@@ -13,3 +13,4 @@ public record ProdutoResponseDTO(
     String tipo,
     String status
 ) {}
+

@@ -1,4 +1,4 @@
-package br.unitins.resource;
+﻿package br.unitins.resource;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -30,10 +30,7 @@ public class AuthResource {
     @Inject
     JsonWebToken jwt;
 
-    /**
-     * Endpoint de login via Keycloak
-     * Acesse: GET /auth/login (será redirecionado para Keycloak)
-     */
+    
     @GET
     @Path("/login")
     public Response redirectToKeycloak() {
@@ -42,9 +39,7 @@ public class AuthResource {
                 .build();
     }
 
-    /**
-     * Obtém informações do usuário autenticado via Keycloak
-     */
+    
     @GET
     @Path("/me")
     @RolesAllowed({"CLIENTE", "ADMIN"})
@@ -54,9 +49,7 @@ public class AuthResource {
         return Response.ok(response).build();
     }
 
-    /**
-     * Registra um novo usuário (antes de usar Keycloak)
-     */
+    
     @POST
     @Path("/register")
     public Response register(@Valid UsuarioRegisterRequestDTO dto) {
@@ -64,9 +57,7 @@ public class AuthResource {
         return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
-    /**
-     * Registro completo com endereço
-     */
+    
     @POST
     @Path("/register/completo")
     public Response registerComplete(@Valid UsuarioCompleteRegisterRequestDTO dto) {
@@ -74,9 +65,7 @@ public class AuthResource {
         return Response.status(Response.Status.CREATED).entity(response).build();
     }
 
-    /**
-     * Solicita recuperação de senha
-     */
+    
     @POST
     @Path("/forgot-password")
     public Response forgotPassword(@Valid UsuarioPasswordForgotRequestDTO dto) {
@@ -84,9 +73,7 @@ public class AuthResource {
         return Response.ok().build();
     }
 
-    /**
-     * Logout - Keycloak gerencia automaticamente via sessão OIDC
-     */
+    
     @GET
     @Path("/logout")
     public Response logout() {
@@ -95,3 +82,4 @@ public class AuthResource {
                 .build();
     }
 }
+

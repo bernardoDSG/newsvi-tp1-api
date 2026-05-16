@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -8,3 +8,4 @@ public record UsuarioPasswordForgotRequestDTO(
     @NotBlank(message = "Nova senha e obrigatoria")
     String novaSenha
 ) {}
+

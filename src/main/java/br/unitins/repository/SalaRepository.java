@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import br.unitins.model.Sala;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;

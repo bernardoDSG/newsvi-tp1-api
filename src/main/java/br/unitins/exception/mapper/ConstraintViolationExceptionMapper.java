@@ -1,4 +1,4 @@
-package br.unitins.exception.mapper;
+﻿package br.unitins.exception.mapper;
 
 import br.unitins.exception.ProblemDetail;
 import jakarta.validation.ConstraintViolation;
@@ -44,3 +44,4 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
         return lastDot >= 0 ? propertyPath.substring(lastDot + 1) : propertyPath;
     }
 }
+

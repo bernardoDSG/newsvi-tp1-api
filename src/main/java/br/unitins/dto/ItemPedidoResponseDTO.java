@@ -1,4 +1,4 @@
-package br.unitins.dto;
+﻿package br.unitins.dto;
 
 import java.math.BigDecimal;
 
@@ -13,3 +13,4 @@ public record ItemPedidoResponseDTO(
     Long poltronaId,
     String poltronaCodigo
 ) {}
+

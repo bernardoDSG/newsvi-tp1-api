@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,8 +39,6 @@ public class Sessao extends DefaultEntity {
                joinColumns = @JoinColumn(name = "sessao_id"), 
                inverseJoinColumns = @JoinColumn(name = "sala_id"))
     private List<Sala> salas = new ArrayList<>();
-
-    // Getters e Setters (sem preco)
     public LocalDateTime getInicio() { return inicio; }
     public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
 

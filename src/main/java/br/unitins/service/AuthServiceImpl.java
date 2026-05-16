@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import br.unitins.dto.AuthRequestDTO;
 import br.unitins.dto.AuthResponseDTO;
@@ -34,3 +34,4 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponseDTO(token, "Bearer");
     }
 }
+

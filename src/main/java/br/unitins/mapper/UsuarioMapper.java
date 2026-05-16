@@ -1,4 +1,4 @@
-package br.unitins.mapper;
+﻿package br.unitins.mapper;
 
 import br.unitins.dto.UsuarioResponseDTO;
 import br.unitins.model.Usuario;
@@ -18,3 +18,4 @@ public class UsuarioMapper {
         );
     }
 }
+

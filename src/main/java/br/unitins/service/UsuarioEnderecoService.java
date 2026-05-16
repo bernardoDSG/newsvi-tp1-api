@@ -1,4 +1,4 @@
-package br.unitins.service;
+﻿package br.unitins.service;
 
 import java.util.List;
 
@@ -11,3 +11,4 @@ public interface UsuarioEnderecoService {
 
     UsuarioEnderecoResponseDTO addEndereco(String login, UsuarioEnderecoRequestDTO dto);
 }
+

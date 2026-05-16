@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -21,3 +21,4 @@ public class Desejo extends DefaultEntity {
     public Sessao getSessao() { return sessao; }
     public void setSessao(Sessao sessao) { this.sessao = sessao; }
 }
+

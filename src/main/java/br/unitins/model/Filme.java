@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,6 @@ public class Filme extends DefaultEntity {
     @ManyToOne
     @JoinColumn(name = "diretor_id")
     private Diretor diretor;
-
-    // CORRIGIDO: usar @Convert para enum, não @ManyToOne
     @Convert(converter = ClassificacaoIndicativaConverter.class)
     private ClassificacaoIndicativa classificacaoIndicativa;
 
@@ -42,8 +40,6 @@ public class Filme extends DefaultEntity {
     @OneToMany
     @JoinTable(name = "filme_premio", joinColumns = @JoinColumn(name = "filme_id"), inverseJoinColumns = @JoinColumn(name = "premio_id"))
     private List<Premio> premios = new ArrayList<>();
-
-    // Método de conversão de duração
     public static Integer converterDuracaoParaMinutos(String duracao) {
         if (duracao == null || duracao.trim().isEmpty()) {
             return null;
@@ -68,8 +64,6 @@ public class Filme extends DefaultEntity {
             return null;
         }
     }
-
-    // Getters e Setters
     public String getNome() {
         return nome;
     }

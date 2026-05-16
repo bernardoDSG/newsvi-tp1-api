@@ -1,4 +1,4 @@
-package br.unitins.exception.mapper;
+﻿package br.unitins.exception.mapper;
 
 import br.unitins.exception.ConflictException;
 import br.unitins.exception.ProblemDetail;
@@ -30,3 +30,4 @@ public class ConflictExceptionMapper implements ExceptionMapper<ConflictExceptio
         return Response.status(409).entity(problemDetail).build();
     }
 }
+

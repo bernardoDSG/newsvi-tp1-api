@@ -1,4 +1,4 @@
-package br.unitins.model;
+﻿package br.unitins.model;
 
 import java.util.ArrayList;
 import java.util.List;

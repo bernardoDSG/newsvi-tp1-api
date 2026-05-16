@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import java.util.List;
 
@@ -17,3 +17,4 @@ public class DesejoRepository implements PanacheRepository<Desejo> {
         return count("usuario.id = ?1 and sessao.id = ?2", usuarioId, sessaoId);
     }
 }
+

@@ -1,4 +1,4 @@
-package br.unitins.util;
+﻿package br.unitins.util;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -27,3 +27,4 @@ public class JwtUtil {
         return jwt.getName();
     }
 }
+

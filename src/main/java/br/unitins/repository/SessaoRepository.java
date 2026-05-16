@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import br.unitins.model.Sessao;
 import br.unitins.model.StatusSessao;
@@ -48,3 +48,4 @@ public class SessaoRepository implements PanacheRepository<Sessao> {
         return find(query, salaId, inicio, fim).count();
     }
 }
+

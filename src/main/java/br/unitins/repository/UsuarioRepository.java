@@ -1,4 +1,4 @@
-package br.unitins.repository;
+﻿package br.unitins.repository;
 
 import java.util.Optional;
 
@@ -17,3 +17,4 @@ public class UsuarioRepository implements PanacheRepository<Usuario> {
         return find("email", email).firstResultOptional();
     }
 }
+

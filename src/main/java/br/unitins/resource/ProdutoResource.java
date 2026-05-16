@@ -1,4 +1,4 @@
-package br.unitins.resource;
+﻿package br.unitins.resource;
 
 import java.util.List;
 
@@ -41,3 +41,4 @@ public class ProdutoResource {
         return Response.ok(ProdutoMapper.toResponseDTO(sessao)).build();
     }
 }
+
