@@ -1,4 +1,4 @@
-﻿package br.unitins.mapper;
+package br.unitins.mapper;
 
 import br.unitins.dto.PremioRequestDTO;
 import br.unitins.dto.PremioResponseDTO;

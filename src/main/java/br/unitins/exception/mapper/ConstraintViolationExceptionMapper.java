@@ -1,4 +1,4 @@
-﻿package br.unitins.exception.mapper;
+package br.unitins.exception.mapper;
 
 import br.unitins.exception.ProblemDetail;
 import jakarta.validation.ConstraintViolation;

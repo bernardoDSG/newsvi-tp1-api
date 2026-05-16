@@ -1,4 +1,4 @@
-﻿package br.unitins.exception;
+package br.unitins.exception;
 
 public class ValidationException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-﻿package br.unitins.dto;
+package br.unitins.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

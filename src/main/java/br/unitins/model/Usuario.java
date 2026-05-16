@@ -1,4 +1,4 @@
-﻿package br.unitins.model;
+package br.unitins.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

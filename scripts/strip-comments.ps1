@@ -1,4 +1,4 @@
-﻿$paths = @()
+$paths = @()
 $paths += Get-ChildItem -Path .\src -Include *.java,*.properties,*.ps1 -Recurse -File -ErrorAction SilentlyContinue
 $paths += Get-ChildItem -Path .\src\main\docker -Filter 'Dockerfile*' -Recurse -File -ErrorAction SilentlyContinue
 $paths += Get-ChildItem -Path .\scripts -Include *.ps1 -Recurse -File -ErrorAction SilentlyContinue

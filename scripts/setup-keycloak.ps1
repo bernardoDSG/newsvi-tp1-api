@@ -1,4 +1,4 @@
-﻿
+
 Write-Host "1. Obtendo token admin..." -ForegroundColor Green
 
 $ADMIN_TOKEN = curl -s -X POST "http://localhost:8180/auth/realms/master/protocol/openid-connect/token" `

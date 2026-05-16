@@ -1,4 +1,4 @@
-﻿package br.unitins.model;
+package br.unitins.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

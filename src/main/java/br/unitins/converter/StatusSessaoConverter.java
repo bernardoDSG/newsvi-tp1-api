@@ -1,4 +1,4 @@
-﻿package br.unitins.converter;
+package br.unitins.converter;
 
 import br.unitins.model.StatusSessao;
 import jakarta.persistence.AttributeConverter;

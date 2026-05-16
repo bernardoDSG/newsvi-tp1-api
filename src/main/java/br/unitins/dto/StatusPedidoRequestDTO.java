@@ -1,4 +1,4 @@
-﻿package br.unitins.dto;
+package br.unitins.dto;
 
 import br.unitins.model.StatusPedido;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-﻿package br.unitins.model;
+package br.unitins.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

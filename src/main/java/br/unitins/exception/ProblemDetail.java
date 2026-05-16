@@ -1,4 +1,4 @@
-﻿package br.unitins.exception;
+package br.unitins.exception;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;

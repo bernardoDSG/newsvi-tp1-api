@@ -1,4 +1,4 @@
-﻿package br.unitins.dto;
+package br.unitins.dto;
 
 public record AuthResponseDTO(
     String token,
