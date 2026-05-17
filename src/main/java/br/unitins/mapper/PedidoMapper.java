@@ -15,9 +15,12 @@ public class PedidoMapper {
         return new PedidoResponseDTO(
             pedido.getId(),
             pedido.getDataCriacao(),
+            pedido.getDataPagamento(),
             pedido.getTotal(),
             pedido.getDesconto(),
             pedido.getStatus() != null ? pedido.getStatus().name() : null,
+            pedido.getFormaPagamento() != null ? pedido.getFormaPagamento().name() : null,
+            pedido.getCodigoPagamento(),
             pedido.getUsuario() != null ? pedido.getUsuario().getLogin() : null,
             pedido.getItens() != null ? pedido.getItens().stream().map(PedidoMapper::toItemResponseDTO).toList() : null
         );

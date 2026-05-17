@@ -7,6 +7,7 @@ import java.util.List;
 import br.unitins.dto.ItemPedidoRequestDTO;
 import br.unitins.dto.PedidoRequestDTO;
 import br.unitins.exception.ValidationException;
+import br.unitins.model.FormaPagamento;
 import br.unitins.model.ItemPedido;
 import br.unitins.model.Pedido;
 import br.unitins.model.Poltrona;
@@ -118,6 +119,37 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional
+    public Pedido iniciarPagamento(Long id, String loginUsuario, FormaPagamento formaPagamento) {
+        if (formaPagamento == null) {
+            throw new ValidationException("Forma de pagamento e obrigatoria", "formaPagamento");
+        }
+
+        Pedido pedido = findMeuPedidoById(id, loginUsuario);
+        if (!StatusPedido.CRIADO.equals(pedido.getStatus())) {
+            throw new ValidationException("Pagamento so pode ser iniciado para pedido com status CRIADO", "status");
+        }
+
+        pedido.setFormaPagamento(formaPagamento);
+        pedido.setCodigoPagamento(gerarCodigoPagamento(pedido));
+        pedido.setStatus(StatusPedido.AGUARDANDO_PAGAMENTO);
+        return pedido;
+    }
+
+    @Override
+    @Transactional
+    public Pedido confirmarPagamento(Long id) {
+        Pedido pedido = findById(id);
+        if (!StatusPedido.AGUARDANDO_PAGAMENTO.equals(pedido.getStatus())) {
+            throw new ValidationException("Pagamento so pode ser confirmado para pedido aguardando pagamento", "status");
+        }
+
+        pedido.setStatus(StatusPedido.PAGO);
+        pedido.setDataPagamento(LocalDateTime.now());
+        return pedido;
+    }
+
+    @Override
+    @Transactional
     public void cancelarMeuPedido(Long id, String loginUsuario) {
         Pedido pedido = findMeuPedidoById(id, loginUsuario);
         if (StatusPedido.CANCELADO.equals(pedido.getStatus())) {
@@ -131,6 +163,12 @@ public class PedidoServiceImpl implements PedidoService {
             Sessao sessao = item.getSessao();
             sessao.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel() + item.getQuantidade());
         }
+    }
+
+    private String gerarCodigoPagamento(Pedido pedido) {
+        String forma = pedido.getFormaPagamento() != null ? pedido.getFormaPagamento().name() : "PAGAMENTO";
+        String id = pedido.getId() != null ? pedido.getId().toString() : String.valueOf(System.currentTimeMillis());
+        return forma + "-NEWSVI-" + id;
     }
 
     private Sessao loadSessao(Long sessaoId) {

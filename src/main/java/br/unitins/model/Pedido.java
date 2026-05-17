@@ -17,11 +17,16 @@ import jakarta.persistence.OneToMany;
 public class Pedido extends DefaultEntity {
 
     private LocalDateTime dataCriacao;
+    private LocalDateTime dataPagamento;
     private BigDecimal total;
     private BigDecimal desconto;
+    private String codigoPagamento;
 
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
+
+    @Enumerated(EnumType.STRING)
+    private FormaPagamento formaPagamento;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
@@ -36,6 +41,14 @@ public class Pedido extends DefaultEntity {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDateTime getDataPagamento() {
+        return dataPagamento;
+    }
+
+    public void setDataPagamento(LocalDateTime dataPagamento) {
+        this.dataPagamento = dataPagamento;
     }
 
     public BigDecimal getTotal() {
@@ -54,12 +67,28 @@ public class Pedido extends DefaultEntity {
         this.desconto = desconto;
     }
 
+    public String getCodigoPagamento() {
+        return codigoPagamento;
+    }
+
+    public void setCodigoPagamento(String codigoPagamento) {
+        this.codigoPagamento = codigoPagamento;
+    }
+
     public StatusPedido getStatus() {
         return status;
     }
 
     public void setStatus(StatusPedido status) {
         this.status = status;
+    }
+
+    public FormaPagamento getFormaPagamento() {
+        return formaPagamento;
+    }
+
+    public void setFormaPagamento(FormaPagamento formaPagamento) {
+        this.formaPagamento = formaPagamento;
     }
 
     public Usuario getUsuario() {

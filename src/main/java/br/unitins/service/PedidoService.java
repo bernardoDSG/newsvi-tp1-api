@@ -3,6 +3,7 @@ package br.unitins.service;
 import java.util.List;
 
 import br.unitins.dto.PedidoRequestDTO;
+import br.unitins.model.FormaPagamento;
 import br.unitins.model.Pedido;
 import br.unitins.model.StatusPedido;
 import jakarta.validation.Valid;
@@ -16,5 +17,7 @@ public interface PedidoService {
     Pedido findById(@NotNull(message = "ID nao pode ser nulo") Long id);
     Pedido findMeuPedidoById(@NotNull(message = "ID nao pode ser nulo") Long id, String loginUsuario);
     void updateStatus(@NotNull(message = "ID nao pode ser nulo") Long id, StatusPedido status);
+    Pedido iniciarPagamento(@NotNull(message = "ID nao pode ser nulo") Long id, String loginUsuario, FormaPagamento formaPagamento);
+    Pedido confirmarPagamento(@NotNull(message = "ID nao pode ser nulo") Long id);
     void cancelarMeuPedido(@NotNull(message = "ID nao pode ser nulo") Long id, String loginUsuario);
 }

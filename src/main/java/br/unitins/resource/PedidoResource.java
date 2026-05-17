@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import br.unitins.dto.PagamentoRequestDTO;
 import br.unitins.dto.PedidoRequestDTO;
 import br.unitins.dto.PedidoResponseDTO;
 import br.unitins.dto.StatusPedidoRequestDTO;
@@ -82,6 +83,21 @@ public class PedidoResource {
     public Response alterarStatus(@PathParam("id") Long id, @Valid StatusPedidoRequestDTO dto) {
         service.updateStatus(id, dto.status());
         return Response.ok(PedidoMapper.toResponseDTO(service.findById(id))).build();
+    }
+
+    @POST
+    @Path("/meus/{id}/pagamento")
+    @RolesAllowed("CLIENTE")
+    public Response iniciarPagamento(@PathParam("id") Long id, @Valid PagamentoRequestDTO dto) {
+        String login = JwtUtil.getLogin(jwt);
+        return Response.ok(PedidoMapper.toResponseDTO(service.iniciarPagamento(id, login, dto.formaPagamento()))).build();
+    }
+
+    @POST
+    @Path("/{id}/pagamento/confirmar")
+    @RolesAllowed("ADMIN")
+    public Response confirmarPagamento(@PathParam("id") Long id) {
+        return Response.ok(PedidoMapper.toResponseDTO(service.confirmarPagamento(id))).build();
     }
 
     @PUT
