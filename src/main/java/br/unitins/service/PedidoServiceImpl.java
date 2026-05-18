@@ -79,12 +79,12 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Pedido> findAll() {
-        return repository.listAll();
+        return repository.listAllWithDetails();
     }
 
     @Override
     public List<Pedido> findMeusPedidos(String loginUsuario) {
-        return repository.findByUsuarioLogin(loginUsuario).list();
+        return repository.findByUsuarioLoginWithDetails(loginUsuario);
     }
 
     @Override
@@ -92,11 +92,8 @@ public class PedidoServiceImpl implements PedidoService {
         if (id == null) {
             throw new IllegalArgumentException("ID nao pode ser nulo");
         }
-        Pedido pedido = repository.findById(id);
-        if (pedido == null) {
-            throw new NotFoundException("Pedido nao encontrado com ID: " + id);
-        }
-        return pedido;
+        return repository.findByIdWithDetails(id)
+                .orElseThrow(() -> new NotFoundException("Pedido nao encontrado com ID: " + id));
     }
 
     @Override
