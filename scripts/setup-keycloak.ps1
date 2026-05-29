@@ -3,6 +3,15 @@
 # Execute depois do Keycloak estar rodando em http://localhost:8180
 # ============================================================
 
+param(
+  [string]$MailtrapHost = $env:MAILTRAP_HOST,
+  [string]$MailtrapPort = $env:MAILTRAP_PORT,
+  [string]$MailtrapUser = $env:MAILTRAP_USER,
+  [string]$MailtrapPass = $env:MAILTRAP_PASS,
+  [string]$MailFrom = $env:MAIL_FROM,
+  [string]$MailFromDisplayName = $env:MAIL_FROM_DISPLAY_NAME
+)
+
 $ErrorActionPreference = "Stop"
 
 $KeycloakUrl = "http://localhost:8180"
@@ -17,6 +26,11 @@ $ClientePass = "SenhaForte123!"
 
 $AdminAppUser = "admin@teste.com"
 $AdminAppPass = "AdminForte123!"
+
+if (-not $MailtrapHost) { $MailtrapHost = "sandbox.smtp.mailtrap.io" }
+if (-not $MailtrapPort) { $MailtrapPort = "2525" }
+if (-not $MailFrom) { $MailFrom = "no-reply@newsvi.local" }
+if (-not $MailFromDisplayName) { $MailFromDisplayName = "Newsvi" }
 
 function Get-JsonHeaders {
   param([Parameter(Mandatory = $true)][string]$Token)
@@ -139,6 +153,26 @@ $RealmConfig.ssoSessionIdleTimeout = 14400
 $RealmConfig.ssoSessionMaxLifespan = 28800
 Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken -Body $RealmConfig | Out-Null
 Write-Host "Access token configurado para 30 minutos." -ForegroundColor Cyan
+
+if ($MailtrapUser -and $MailtrapPass) {
+  Write-Host "Configurando SMTP Mailtrap do realm..." -ForegroundColor Green
+  $RealmConfig = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken
+  $RealmConfig.smtpServer = @{
+    host = $MailtrapHost
+    port = "$MailtrapPort"
+    from = $MailFrom
+    fromDisplayName = $MailFromDisplayName
+    auth = "true"
+    ssl = "false"
+    starttls = "true"
+    user = $MailtrapUser
+    password = $MailtrapPass
+  }
+  Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken -Body $RealmConfig | Out-Null
+  Write-Host "SMTP Mailtrap configurado." -ForegroundColor Cyan
+} else {
+  Write-Host "SMTP Mailtrap nao configurado. Defina MAILTRAP_USER e MAILTRAP_PASS antes de rodar este script." -ForegroundColor Yellow
+}
 
 Write-Host "Criando roles se necessario..." -ForegroundColor Green
 
