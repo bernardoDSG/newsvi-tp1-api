@@ -177,7 +177,8 @@ public class KeycloakPasswordServiceImpl implements KeycloakPasswordService {
 
         HttpResponse<String> response = send(request);
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new ValidationException("Nao foi possivel enviar email de redefinicao pelo Keycloak");
+            throw new ValidationException("Nao foi possivel enviar email de redefinicao pelo Keycloak. Status "
+                    + response.statusCode() + ": " + response.body());
         }
     }
 

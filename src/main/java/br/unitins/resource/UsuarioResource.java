@@ -51,11 +51,7 @@ public class UsuarioResource {
     @Path("/esqueci-senha")
     @PermitAll
     public Response esqueciSenha(@Valid EsqueciSenhaRequestDTO dto) {
-<<<<<<< HEAD
         passwordService.solicitarRedefinicaoSenha(dto.login());
-=======
-        passwordService.enviarEmailRedefinicaoSenha(dto.login());
->>>>>>> 2f4b9a28d3246a384eb2cec96ac6a589a838a5ea
         return Response.noContent().build();
     }
 

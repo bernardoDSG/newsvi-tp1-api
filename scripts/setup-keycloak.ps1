@@ -26,6 +26,18 @@ $ClientePass = "SenhaForte123!"
 
 $AdminAppUser = "admin@teste.com"
 $AdminAppPass = "AdminForte123!"
+$MasterAdminEmail = "admin@teste.com"
+
+# Mailtrap Email Sandbox SMTP.
+# Configure uma vez no PowerShell antes de rodar este setup:
+#   $env:MAILTRAP_SMTP_USER="seu_usuario_mailtrap"
+#   $env:MAILTRAP_SMTP_PASS="sua_senha_mailtrap"
+$MailtrapSmtpHost = "sandbox.smtp.mailtrap.io"
+$MailtrapSmtpPort = "2525"
+$MailtrapSmtpUser = $env:MAILTRAP_SMTP_USER
+$MailtrapSmtpPass = $env:MAILTRAP_SMTP_PASS
+$MailFrom = "no-reply@newsvi.com"
+$MailFromDisplayName = "Newsvi"
 
 if (-not $MailtrapHost) { $MailtrapHost = "sandbox.smtp.mailtrap.io" }
 if (-not $MailtrapPort) { $MailtrapPort = "2525" }
@@ -132,6 +144,19 @@ if (-not $AdminToken) {
 
 Write-Host "Token admin obtido." -ForegroundColor Cyan
 
+Write-Host "Garantindo email do admin master..." -ForegroundColor Green
+$MasterUsers = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/master/users?username=$AdminUser" -Token $AdminToken
+$MasterAdmin = Find-ByProperty -Items $MasterUsers -Property "username" -Value $AdminUser
+
+if ($MasterAdmin) {
+  $MasterAdmin.email = $MasterAdminEmail
+  $MasterAdmin.emailVerified = $true
+  Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/master/users/$($MasterAdmin.id)" -Token $AdminToken -Body $MasterAdmin | Out-Null
+  Write-Host "Email do admin master configurado: $MasterAdminEmail" -ForegroundColor Cyan
+} else {
+  Write-Host "Admin master '$AdminUser' nao encontrado para configurar email." -ForegroundColor Yellow
+}
+
 Write-Host "Verificando realm '$Realm'..." -ForegroundColor Green
 $RealmExists = Test-KeycloakExists -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken
 
@@ -151,8 +176,32 @@ $RealmConfig = Invoke-Keycloak -Method "GET" -Uri "$KeycloakUrl/admin/realms/$Re
 $RealmConfig.accessTokenLifespan = 1800
 $RealmConfig.ssoSessionIdleTimeout = 14400
 $RealmConfig.ssoSessionMaxLifespan = 28800
+
+if ($MailtrapSmtpUser -and $MailtrapSmtpPass) {
+  Write-Host "Configurando SMTP Mailtrap no realm..." -ForegroundColor Green
+  $RealmConfig.smtpServer = @{
+    host = $MailtrapSmtpHost
+    port = $MailtrapSmtpPort
+    from = $MailFrom
+    fromDisplayName = $MailFromDisplayName
+    replyTo = $MailFrom
+    replyToDisplayName = $MailFromDisplayName
+    envelopeFrom = $MailFrom
+    auth = "true"
+    user = $MailtrapSmtpUser
+    password = $MailtrapSmtpPass
+    ssl = "false"
+    starttls = "true"
+  }
+} else {
+  Write-Host "SMTP Mailtrap nao configurado. Defina MAILTRAP_SMTP_USER e MAILTRAP_SMTP_PASS para configurar automaticamente." -ForegroundColor Yellow
+}
+
 Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm" -Token $AdminToken -Body $RealmConfig | Out-Null
 Write-Host "Access token configurado para 30 minutos." -ForegroundColor Cyan
+if ($MailtrapSmtpUser -and $MailtrapSmtpPass) {
+  Write-Host "SMTP Mailtrap configurado." -ForegroundColor Cyan
+}
 
 if ($MailtrapUser -and $MailtrapPass) {
   Write-Host "Configurando SMTP Mailtrap do realm..." -ForegroundColor Green
@@ -315,6 +364,13 @@ foreach ($UserData in $UsersToCreate) {
   }
 
   $UserUuid = $ExistingUser.id
+
+  $ExistingUser.email = $Username
+  $ExistingUser.emailVerified = $true
+  $ExistingUser.firstName = $UserData.FirstName
+  $ExistingUser.lastName = $UserData.LastName
+  $ExistingUser.enabled = $true
+  Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm/users/$UserUuid" -Token $AdminToken -Body $ExistingUser | Out-Null
 
   Invoke-Keycloak -Method "PUT" -Uri "$KeycloakUrl/admin/realms/$Realm/users/$UserUuid/reset-password" -Token $AdminToken -Body @{
     type = "password"
