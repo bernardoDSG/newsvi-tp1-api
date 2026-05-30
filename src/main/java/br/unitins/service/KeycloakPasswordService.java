@@ -7,4 +7,6 @@ public interface KeycloakPasswordService {
     void solicitarRedefinicaoSenha(String login);
 
     void redefinirSenha(String login, String novaSenha);
+
+    void enviarEmailRedefinicaoSenha(String login);
 }
