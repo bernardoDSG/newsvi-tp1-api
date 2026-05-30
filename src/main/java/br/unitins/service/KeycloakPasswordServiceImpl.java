@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -46,6 +47,13 @@ public class KeycloakPasswordServiceImpl implements KeycloakPasswordService {
     public void alterarSenha(String login, String senhaAtual, String novaSenha) {
         validarSenhaAtual(login, senhaAtual);
         redefinirSenha(login, novaSenha);
+    }
+
+    @Override
+    public void solicitarRedefinicaoSenha(String login) {
+        String adminToken = obterAdminToken();
+        String userId = buscarUsuarioKeycloak(adminToken, login);
+        enviarEmailRedefinicaoSenha(adminToken, userId);
     }
 
     @Override
@@ -142,6 +150,27 @@ public class KeycloakPasswordServiceImpl implements KeycloakPasswordService {
             return null;
         } catch (IOException | NullPointerException e) {
             throw new ValidationException("Resposta invalida ao consultar usuarios no Keycloak");
+        }
+    }
+
+    private void enviarEmailRedefinicaoSenha(String adminToken, String userId) {
+        String body;
+        try {
+            body = objectMapper.writeValueAsString(List.of("UPDATE_PASSWORD"));
+        } catch (IOException e) {
+            throw new ValidationException("Nao foi possivel montar requisicao de redefinicao de senha");
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl() + "/admin/realms/" + realm() + "/users/" + userId + "/execute-actions-email"))
+            .header("Authorization", "Bearer " + adminToken)
+            .header("Content-Type", "application/json")
+            .PUT(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+
+        HttpResponse<String> response = send(request);
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new ValidationException("Nao foi possivel enviar email de redefinicao pelo Keycloak");
         }
     }
 
