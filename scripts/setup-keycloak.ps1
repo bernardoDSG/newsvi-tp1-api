@@ -38,6 +38,7 @@ $MailtrapSmtpUser = $env:MAILTRAP_SMTP_USER
 $MailtrapSmtpPass = $env:MAILTRAP_SMTP_PASS
 $MailFrom = "no-reply@newsvi.com"
 $MailFromDisplayName = "Newsvi"
+$ApplicationPropertiesPath = Join-Path $PSScriptRoot "..\src\main\resources\application.properties"
 
 if (-not $MailtrapHost) { $MailtrapHost = "sandbox.smtp.mailtrap.io" }
 if (-not $MailtrapPort) { $MailtrapPort = "2525" }
@@ -320,6 +321,15 @@ if (-not $ClientSecret) {
   Write-Host "Erro: nao consegui obter o client secret." -ForegroundColor Red
   Write-Host "No Admin Console, abra Clients > newsvi-api > Settings e confira se Client authentication esta ON." -ForegroundColor Red
   exit 1
+}
+
+if (Test-Path $ApplicationPropertiesPath) {
+  $ApplicationProperties = Get-Content -Raw $ApplicationPropertiesPath
+  $ApplicationProperties = $ApplicationProperties -replace "quarkus\.oidc\.credentials\.secret=.*", "quarkus.oidc.credentials.secret=$ClientSecret"
+  Set-Content -Path $ApplicationPropertiesPath -Value $ApplicationProperties -Encoding UTF8
+  Write-Host "application.properties atualizado com o client secret." -ForegroundColor Cyan
+} else {
+  Write-Host "application.properties nao encontrado para atualizar automaticamente." -ForegroundColor Yellow
 }
 
 Write-Host "Criando usuarios se necessario..." -ForegroundColor Green
