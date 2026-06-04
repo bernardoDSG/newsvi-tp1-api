@@ -1,5 +1,6 @@
 package br.unitins.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Sessao extends DefaultEntity {
     private LocalDateTime fim;
     private Integer capacidadeTotal;
     private Integer capacidadeDisponivel;
+    private BigDecimal preco;
 
     @Convert(converter = TipoSessaoConverter.class)
     private TipoSessao tipo;
@@ -40,7 +42,6 @@ public class Sessao extends DefaultEntity {
                inverseJoinColumns = @JoinColumn(name = "sala_id"))
     private List<Sala> salas = new ArrayList<>();
 
-    // Getters e Setters (sem preco)
     public LocalDateTime getInicio() { return inicio; }
     public void setInicio(LocalDateTime inicio) { this.inicio = inicio; }
 
@@ -52,6 +53,9 @@ public class Sessao extends DefaultEntity {
 
     public Integer getCapacidadeDisponivel() { return capacidadeDisponivel; }
     public void setCapacidadeDisponivel(Integer capacidadeDisponivel) { this.capacidadeDisponivel = capacidadeDisponivel; }
+
+    public BigDecimal getPreco() { return preco; }
+    public void setPreco(BigDecimal preco) { this.preco = preco; }
 
     public TipoSessao getTipo() { return tipo; }
     public void setTipo(TipoSessao tipo) { this.tipo = tipo; }

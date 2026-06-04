@@ -15,6 +15,7 @@ public class SessaoMapper {
         sessao.setFim(dto.fim());
         sessao.setCapacidadeTotal(dto.capacidadeTotal());
         sessao.setCapacidadeDisponivel(dto.capacidadeDisponivel());
+        sessao.setPreco(dto.preco());
         
         if (dto.statusId() != null) {
             sessao.setStatus(StatusSessao.valueOf(dto.statusId()));
@@ -33,6 +34,7 @@ public class SessaoMapper {
             sessao.getFim(),
             sessao.getCapacidadeTotal(),
             sessao.getCapacidadeDisponivel(),
+            sessao.getPreco(),
             sessao.getStatus() != null ? sessao.getStatus().name() : null,
             sessao.getStatus() != null ? sessao.getStatus().getNome() : null,
             sessao.getTipo() != null ? sessao.getTipo().getNome() : null,

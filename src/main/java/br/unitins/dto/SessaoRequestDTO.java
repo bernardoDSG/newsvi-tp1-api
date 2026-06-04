@@ -1,8 +1,10 @@
 package br.unitins.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,6 +25,10 @@ public record SessaoRequestDTO(
     @NotNull(message = "Capacidade disponível é obrigatória")
     @Positive(message = "Capacidade disponível deve ser positiva")
     Integer capacidadeDisponivel,
+
+    @NotNull(message = "Preco e obrigatorio")
+    @DecimalMin(value = "0.01", message = "Preco deve ser maior que zero")
+    BigDecimal preco,
     
     @NotNull(message = "Status é obrigatório")
     @Positive(message = "ID do status deve ser positivo")

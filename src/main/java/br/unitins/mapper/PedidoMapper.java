@@ -29,7 +29,6 @@ public class PedidoMapper {
     private static ItemPedidoResponseDTO toItemResponseDTO(ItemPedido item) {
         return new ItemPedidoResponseDTO(
             item.getId(),
-            item.getQuantidade(),
             item.getValorUnitario(),
             item.getDescontoUnitario(),
             item.getSessao() != null ? item.getSessao().getId() : null,

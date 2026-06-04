@@ -14,6 +14,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -154,6 +155,7 @@ class SessaoResourceHttpContractTest {
         .then()
             .statusCode(201)
             .body("id", equalTo(10))
+            .body("preco", equalTo(35.50f))
             .body("salasIds[0]", equalTo(5));
     }
 
@@ -214,7 +216,7 @@ class SessaoResourceHttpContractTest {
         LocalDateTime inicio = LocalDateTime.now().plusDays(1).withHour(20).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime fim = inicio.plusHours(2);
         return """
-            {"inicio":"%s","fim":"%s","capacidadeTotal":150,"capacidadeDisponivel":150,"statusId":2,"tipoSessaoId":1,"filmeId":3,"cinemaId":4,"salasIds":[5]}
+            {"inicio":"%s","fim":"%s","capacidadeTotal":150,"capacidadeDisponivel":150,"preco":35.50,"statusId":2,"tipoSessaoId":1,"filmeId":3,"cinemaId":4,"salasIds":[5]}
             """.formatted(inicio, fim);
     }
 
@@ -226,6 +228,7 @@ class SessaoResourceHttpContractTest {
         sessao.setFim(inicio.plusHours(2));
         sessao.setCapacidadeTotal(150);
         sessao.setCapacidadeDisponivel(150);
+        sessao.setPreco(new BigDecimal("35.50"));
         sessao.setStatus(StatusSessao.EM_EXIBICAO);
         sessao.setTipo(TipoSessao.DUBLADA);
         sessao.setFilme(filme(3L, "Deadpool 3"));

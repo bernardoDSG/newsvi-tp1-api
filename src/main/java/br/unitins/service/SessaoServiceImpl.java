@@ -133,6 +133,12 @@ public class SessaoServiceImpl implements SessaoService {
             }
             existente.setCapacidadeTotal(sessao.getCapacidadeTotal());
         }
+        if (sessao.getPreco() != null) {
+            if (sessao.getPreco().signum() <= 0) {
+                throw new ValidationException("Preco deve ser maior que zero", "preco");
+            }
+            existente.setPreco(sessao.getPreco());
+        }
         if (sessao.getCapacidadeDisponivel() != null) {
             existente.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel());
         }
@@ -162,6 +168,9 @@ public class SessaoServiceImpl implements SessaoService {
         }
         if (sessao.getCapacidadeTotal() == null || sessao.getCapacidadeTotal() <= 0) {
             throw new ValidationException("Capacidade total deve ser maior que zero", "capacidadeTotal");
+        }
+        if (sessao.getPreco() == null || sessao.getPreco().signum() <= 0) {
+            throw new ValidationException("Preco deve ser maior que zero", "preco");
         }
     }
 

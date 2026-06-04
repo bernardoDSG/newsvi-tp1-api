@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public record ItemPedidoResponseDTO(
     Long id,
-    Integer quantidade,
     BigDecimal valorUnitario,
     BigDecimal descontoUnitario,
     Long sessaoId,

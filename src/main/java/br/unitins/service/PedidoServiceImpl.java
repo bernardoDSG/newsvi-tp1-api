@@ -27,6 +27,8 @@ import jakarta.ws.rs.NotFoundException;
 @ApplicationScoped
 public class PedidoServiceImpl implements PedidoService {
 
+    private static final int QUANTIDADE_POR_POLTRONA = 1;
+
     @Inject
     PedidoRepository repository;
 
@@ -55,20 +57,20 @@ public class PedidoServiceImpl implements PedidoService {
 
         for (ItemPedidoRequestDTO itemDto : dto.itens()) {
             Sessao sessao = loadSessao(itemDto.sessaoId());
-            validarCapacidade(sessao, itemDto.quantidade());
+            validarPreco(sessao);
+            validarCapacidade(sessao);
 
             ItemPedido item = new ItemPedido();
             item.setSessao(sessao);
             item.setPoltrona(loadPoltrona(itemDto.poltronaId()));
-            item.setQuantidade(itemDto.quantidade());
-            item.setValorUnitario(itemDto.valorUnitario());
-            item.setDescontoUnitario(itemDto.descontoUnitario() != null ? itemDto.descontoUnitario() : BigDecimal.ZERO);
+            item.setQuantidade(QUANTIDADE_POR_POLTRONA);
+            item.setValorUnitario(sessao.getPreco());
+            item.setDescontoUnitario(BigDecimal.ZERO);
             pedido.addItem(item);
 
-            BigDecimal quantidade = BigDecimal.valueOf(item.getQuantidade());
-            total = total.add(item.getValorUnitario().multiply(quantidade));
-            desconto = desconto.add(item.getDescontoUnitario().multiply(quantidade));
-            sessao.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel() - item.getQuantidade());
+            total = total.add(item.getValorUnitario());
+            desconto = desconto.add(item.getDescontoUnitario());
+            sessao.setCapacidadeDisponivel(sessao.getCapacidadeDisponivel() - QUANTIDADE_POR_POLTRONA);
         }
 
         pedido.setDesconto(desconto);
@@ -178,7 +180,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     private Poltrona loadPoltrona(Long poltronaId) {
         if (poltronaId == null) {
-            return null;
+            throw new ValidationException("Poltrona e obrigatoria", "poltronaId");
         }
         Poltrona poltrona = poltronaRepository.findById(poltronaId);
         if (poltrona == null) {
@@ -187,9 +189,15 @@ public class PedidoServiceImpl implements PedidoService {
         return poltrona;
     }
 
-    private void validarCapacidade(Sessao sessao, Integer quantidade) {
-        if (sessao.getCapacidadeDisponivel() == null || sessao.getCapacidadeDisponivel() < quantidade) {
-            throw new ValidationException("Capacidade indisponivel para a sessao", "quantidade");
+    private void validarCapacidade(Sessao sessao) {
+        if (sessao.getCapacidadeDisponivel() == null || sessao.getCapacidadeDisponivel() < QUANTIDADE_POR_POLTRONA) {
+            throw new ValidationException("Capacidade indisponivel para a sessao", "sessaoId");
+        }
+    }
+
+    private void validarPreco(Sessao sessao) {
+        if (sessao.getPreco() == null || sessao.getPreco().signum() <= 0) {
+            throw new ValidationException("Sessao sem preco valido configurado", "sessaoId");
         }
     }
 }
